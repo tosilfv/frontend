@@ -1,0 +1,8 @@
+.Player {
+  align-items: flex-end;
+  background-color: #000;
+  color: #fff;
+  display: flex;
+  height: 26vh;
+  overflow: auto;
+}

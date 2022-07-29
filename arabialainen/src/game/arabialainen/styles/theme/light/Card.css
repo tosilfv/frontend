@@ -1,0 +1,7 @@
+.Card:hover {
+  margin-bottom: 5px;
+}
+.Card-table {
+  position: absolute;
+  top: 35vh;
+}

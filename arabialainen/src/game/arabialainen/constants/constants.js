@@ -1,0 +1,10 @@
+export const API_BASE = 'https://deckofcardsapi.com/api/deck/'
+export const DECK_COUNT = 1
+export const DRAW_INIT = 7
+export const DRAW_ONE = 1
+export const DRAW_ZERO = 0
+export const JOKERS_ENABLED = true
+export const PILE_CPU = 'cpuPile'
+export const PILE_DISCARD = 'discardPile'
+export const PILE_PLAYER = 'playerPile'
+export const PILE_TABLE = 'tablePile'
