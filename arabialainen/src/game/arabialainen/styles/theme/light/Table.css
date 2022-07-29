@@ -3,20 +3,21 @@
   background-color: #2a2;
   display: flex;
   flex-direction: column;
-  height: 64vh;
-  justify-content: center;
+  height: 70vh;
+  justify-content: flex-start;
+  overflow: hidden;
   width: 100vw;
+  z-index: 0;
 }
 .Table-piles {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
-  height: 100%;
   justify-content: space-between;
-  overflow: hidden;
   width: 100%;
+  z-index: 0;
 }
 .Table-playfield {
-  height: 50%;
+  z-index: 0;
 }
 @keyframes cpuThinking {
   from {

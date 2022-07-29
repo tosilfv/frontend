@@ -3,6 +3,7 @@
   background-color: #000;
   color: #fff;
   display: flex;
-  height: 26vh;
+  height: 30vh;
   overflow: auto;
+  z-index: 1;
 }

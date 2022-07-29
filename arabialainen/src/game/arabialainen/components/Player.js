@@ -17,7 +17,7 @@ class Player extends Component {
   }
   render() {
     return (
-      <div className="Player">
+      <div>
         {this.handleMapPile()}
       </div>
     )

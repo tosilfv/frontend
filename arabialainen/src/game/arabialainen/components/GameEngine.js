@@ -284,9 +284,6 @@ class GameEngine extends Component {
     console.log(this.state.turn)
     return (
       <div>
-        <div className='Cpu'>
-          <div className="Cpu-loader">cpu</div>
-        </div>
         <Table
           initGame={this.initGame}
           mapPile={mapPile}

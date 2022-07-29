@@ -25,6 +25,9 @@ class Table extends Component {
     const { startButton } = this.props
     return (
       <div className="Table">
+        <div className='Cpu'>
+          <div className="Cpu-loader">cpu</div>
+        </div>
         <div className="Table-piles">
           <Deck />
           <Discard />
