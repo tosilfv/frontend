@@ -15,3 +15,7 @@ Basically all central files are in the game\arabialainen folder. The first versi
 
 ## Other, miscellaneous
 v1: This game is still a work in progress containing only the bare necessities and no rules are applied.
+v11: Cpu loader fixed.
+
+## Known errors
+E1. When player repeatedly clicks own cards, axios errors appear.

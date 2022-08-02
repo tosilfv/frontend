@@ -16,12 +16,13 @@ import {
   PILE_PLAYER,
   PILE_TABLE,
 } from '../constants/constants'
-import Table from './Table'
 import '../styles/theme/light/Cpu.css'
+import '../styles/theme/light/Deck.css'
+import '../styles/theme/light/Discard.css'
 import '../styles/theme/light/Player.css'
 import '../styles/theme/light/Table.css'
-import Card from './Card'
 import axios from 'axios'
+import { createCard } from '../helpers/helpers'
 
 class GameEngine extends Component {
   constructor(props) {
@@ -31,6 +32,8 @@ class GameEngine extends Component {
       deckId: null,
       discardPile: [],
       playerPile: [],
+      spinAmount: 1,
+      spinVisibility: 'hidden',
       startButton: 'visible',
       tablePile: [],
       turn: 'player'
@@ -43,10 +46,7 @@ class GameEngine extends Component {
     this.setState({ deckId })
   }
   async componentDidUpdate() {
-    console.log('componentDidUpdate: ', this.state.turn)
     if (this.state.turn === 'cpu') {
-      console.log('hello1')
-      // 9. kutsu tietokoneen lyöntifunktiota
       this.hitCpuCard()
     }
   }
@@ -54,18 +54,14 @@ class GameEngine extends Component {
     await this.dealToPile(DRAW_ONE, toPile)
   }
   async hitCpuCard() {
-    // 0. tarkista, että on tietokoneen vuoro
-    console.log('hitCpuCard: ', this.state.turn)
     if (this.state.turn === 'cpu') {
-      console.log('hello2')
       let deckCardCode = null
       let pileResCpu = null
       let pileResTable = null
-      // 1. tietokone valitsee oman korttinsa
+      // select random card from cpu pile
       let randNum = Math.floor(Math.random() * this.state.cpuPile.length)
       let cpuCardCode = this.state.cpuPile[randNum].code
-      console.log('this.state.cpuPile: ', this.state.cpuPile)
-      // 2. poista kortti tietokoneen pinosta
+      // call api to draw from cpu pile
       try {
         const pileRes = await axios.get(
           `${API_BASE}${this.state.deckId}/pile/${PILE_CPU}/draw/?cards=${cpuCardCode}`
@@ -76,7 +72,7 @@ class GameEngine extends Component {
       } catch (error) {
         throw new Error(`Cannot draw card error: ${error}.`)
       }
-      // 3. lisää kortti pöydän pinoon
+      // call api to add card to table pile
       try {
         const pileRes = await axios.get(
           `${API_BASE}${this.state.deckId}/pile/${PILE_TABLE}/add/?cards=${cpuCardCode}`
@@ -87,7 +83,7 @@ class GameEngine extends Component {
       } catch (error) {
         throw new Error(`Cannot add card error: ${error}.`)
       }
-      // 4. poista kortti pakasta
+      // call api to remove card from deck
       try {
         const pileRes = await axios.get(
           `${API_BASE}${this.state.deckId}/draw/?count=${DRAW_ONE}`
@@ -95,12 +91,12 @@ class GameEngine extends Component {
         if (!pileRes.data.success) {
           throw new Error(`Error: cannot draw card from deck ${this.state.deckId} for cpu.`)
         }
-        // tallenna kortin koodi
+        // save card code
         deckCardCode = pileRes.data.cards[0].code
       } catch (error) {
         throw new Error(`Cannot draw card from deck for cpu error: ${error}.`)
       }
-      // 5. lisää kortti tietokoneen pinoon
+      // call api to add card to cpu pile
       try {
         const pileRes = await axios.get(
           `${API_BASE}${this.state.deckId}/pile/${PILE_CPU}/add/?cards=${deckCardCode}`
@@ -111,7 +107,7 @@ class GameEngine extends Component {
       } catch (error) {
         throw new Error(`Cannot add card for cpu error: ${error}.`)
       }
-      // 6. listaa näkyville pöydän kortit
+      // call api to list table pile
       try {
         pileResTable = await axios.get(
           `${API_BASE}${this.state.deckId}/pile/${PILE_TABLE}/list/`
@@ -122,7 +118,7 @@ class GameEngine extends Component {
       } catch (error) {
         throw new Error(`Cannot list cards error: ${error}.`)
       }
-      // 7. listaa tietokoneen kortit
+      // call api to list cpu pile
       try {
         pileResCpu = await axios.get(
           `${API_BASE}${this.state.deckId}/pile/${PILE_CPU}/list/`
@@ -130,26 +126,30 @@ class GameEngine extends Component {
         if (!pileResCpu.data.success) {
           throw new Error(`Error: cannot list cards for ${PILE_CPU}.`)
         }
-        // 8. vaihda vuoro pelaajalle
-        // aseta uusi tietokoneen korttien tila
-        // aseta uusi pöydän korttien tila
-        this.setState({
-          turn: 'player',
-          [PILE_CPU]: pileResCpu.data.piles[PILE_CPU].cards,
-          [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards
-        })
+        // change turn to player
+        // set state for cpu and table
+        // set spinloader timeout from 100 to 3000 ms
+        let randNum = Math.floor(Math.random() * 31) * 100 // ms
+        setTimeout(() => {
+          this.setState({
+            turn: 'player',
+            [PILE_CPU]: pileResCpu.data.piles[PILE_CPU].cards,
+            [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards,
+            spinAmount: 1,
+            spinVisibility: 'hidden'
+          })
+        }, randNum);
       } catch (error) {
         throw new Error(`Cannot list cards error: ${error}.`)
       }
     }
   }
   async hitPlayerCard(code, fromPile, toPile) {
-    // 0. tarkista, että on pelaajan vuoro
     if (this.state.turn === 'player') {
       let deckCardCode = null
       let pileResPlayer = null
       let pileResTable = null
-      // 2. poista kortti pelaajan pinosta
+      // call api to draw from player pile
       try {
         const pileRes = await axios.get(
           `${API_BASE}${this.state.deckId}/pile/${fromPile}/draw/?cards=${code}`
@@ -160,7 +160,7 @@ class GameEngine extends Component {
       } catch (error) {
         throw new Error(`Cannot draw card error: ${error}.`)
       }
-      // 3. lisää kortti pöydän pinoon
+      // call api to add card to table pile
       try {
         const pileRes = await axios.get(
           `${API_BASE}${this.state.deckId}/pile/${toPile}/add/?cards=${code}`
@@ -171,7 +171,7 @@ class GameEngine extends Component {
       } catch (error) {
         throw new Error(`Cannot add card error: ${error}.`)
       }
-      // 4. poista kortti pakasta
+      // call api to remove card from deck
       try {
         const pileRes = await axios.get(
           `${API_BASE}${this.state.deckId}/draw/?count=${DRAW_ONE}`
@@ -179,12 +179,12 @@ class GameEngine extends Component {
         if (!pileRes.data.success) {
           throw new Error(`Error: cannot draw card from deck ${this.state.deckId} for player.`)
         }
-        // tallenna kortin koodi
+        // save card code
         deckCardCode = pileRes.data.cards[0].code
       } catch (error) {
         throw new Error(`Cannot draw card from deck for player error: ${error}.`)
       }
-      // 5. lisää kortti pelaajan pinoon
+      // call api to add card to player pile
       try {
         const pileRes = await axios.get(
           `${API_BASE}${this.state.deckId}/pile/${fromPile}/add/?cards=${deckCardCode}`
@@ -195,7 +195,7 @@ class GameEngine extends Component {
       } catch (error) {
         throw new Error(`Cannot add card for player error: ${error}.`)
       }
-      // 6. listaa näkyville pöydän kortit
+      // call api to list table pile
       try {
         pileResTable = await axios.get(
           `${API_BASE}${this.state.deckId}/pile/${toPile}/list/`
@@ -206,7 +206,7 @@ class GameEngine extends Component {
       } catch (error) {
         throw new Error(`Cannot list cards error: ${error}.`)
       }
-      // 7. listaa näkyville pelaajan kortit
+      // call api to list player pile
       try {
         pileResPlayer = await axios.get(
           `${API_BASE}${this.state.deckId}/pile/${fromPile}/list/`
@@ -214,13 +214,14 @@ class GameEngine extends Component {
         if (!pileResPlayer.data.success) {
           throw new Error(`Error: cannot list cards for ${fromPile}.`)
         }
-        // 8. vaihda vuoro tietokoneelle
-        // aseta uusi pelaajan korttien tila
-        // aseta uusi pöydän korttien tila
+        // change turn to cpu
+        // set state for player and table
         this.setState({
           turn: 'cpu',
           [fromPile]: pileResPlayer.data.piles[fromPile].cards,
-          [toPile]: pileResTable.data.piles[toPile].cards
+          [toPile]: pileResTable.data.piles[toPile].cards,
+          spinAmount: 'infinite',
+          spinVisibility: 'visible'
         })
       } catch (error) {
         throw new Error(`Cannot list cards error: ${error}.`)
@@ -267,29 +268,39 @@ class GameEngine extends Component {
   // 8. vaihda vuoro pelaajalle
 
   render() {
-    // 1. pelaaja klikkaa omaa korttiaan
-    // järjestä pelaajan kortit
+    // player clicked a player card
     const pileSorted = sortPile(this.state.playerPile)
-    const playerCards = pileSorted.map((c) => (
-      <Card
-        key={c.code}
-        code={c.code}
-        hitCard={this.hitPlayerCard}
-        image={c.image}
-        name={`${c.value} of ${c.suit}`}
-        pile={PILE_PLAYER}
-        suit={c.suit}
-        value={c.value}
-      />))
-    console.log(this.state.turn)
+    const playerCards = pileSorted.map((c) => createCard(
+      c, this.hitPlayerCard, PILE_PLAYER
+    ))
     return (
       <div>
-        <Table
-          initGame={this.initGame}
-          mapPile={mapPile}
-          startButton={this.state.startButton}
-          tablePile={this.state.tablePile}
-        />
+        <div className="Table">
+          <div className='Cpu'>
+            <div className="Cpu-loader"
+              style={{
+                animationIterationCount: this.state.spinAmount,
+                visibility: this.state.spinVisibility
+              }}
+            >cpu</div>
+          </div>
+          <div className="Table-piles">
+            <div>
+              <div className="Deck">arabialainen</div>
+              <div className="Deck-pick">arabialainen</div>
+            </div>
+            <div className="Discard">arabialainen</div>
+          </div>
+          <div className="Table-playfield">
+            {mapPile(this.state.tablePile, '', PILE_TABLE)}
+            <button
+              style={{ visibility: this.state.startButton }}
+              onClick={this.initGame}
+            >
+              Start New Game
+            </button>
+          </div>
+        </div>
         <div className="Player">
           {playerCards}
         </div>
