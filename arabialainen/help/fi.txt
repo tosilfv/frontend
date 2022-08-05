@@ -17,22 +17,42 @@ Pisteet
 Pisteitä ei jaeta.
 
 Erikoiskortit
-Jokeri = Jokerin päälle voi lyödä vain jokerin. Jokeria ei voi kaataa.
-Jokerin voi lyödä muiden paitsi kympin tai ässän päälle. Tyhjään pöytään lyötyä jokeria ei tarvitse nostaa pöydästä jos sen päälle voi lyödä jokerin, muussa tapauksessa tyhjään pöytään lyödyn jokerin joutuu nostamaan pöydästä.
+Jokeri
+Jokerin päälle voi lyödä vain jokerin.
+Jokeria ei voi kaataa.
+Jokerin voi lyödä muiden paitsi kympin tai ässän päälle.
+Tyhjään pöytään lyötyä jokeria ei tarvitse nostaa pöydästä jos sen päälle voi lyödä jokerin, muussa tapauksessa tyhjään pöytään lyödyn jokerin joutuu nostamaan pöydästä.
 
-2 = Kakkosen päälle voi lyödä minkä kortin vain, paitsi kympin tai ässän, koska kakkosta ei voi kaataa. Kakkosen voi lyödä muiden paitsi jokerin, kympin tai ässän päälle. Tyhjään pöytään lyötyä kakkosta ei tarvitse nostaa pöydästä.
+2
+Kakkosen päälle voi lyödä minkä kortin vain, paitsi kympin tai ässän, koska kakkosta ei voi kaataa.
+Kakkosen voi lyödä muiden paitsi jokerin, kympin tai ässän päälle.
+Tyhjään pöytään lyötyä kakkosta ei tarvitse nostaa pöydästä.
 
-10 = Kympin päälle ei voi lyödä korttia. Kymppi kaataa numerokortit 9, 8, 7, 6, 5, 4 ja 3.
-Kuvallista korttia K, Q, tai J, ei voi lyödä pöytään ennen kuin numerokortit on kaadettu ainakin kerran kympillä. Tyhjään pöytään lyöty kymppi on nostettava pöydästä. Kun pöydän kortit on kaadettu kympillä, vuoro ei vaihdu.
+10
+Kympin päälle ei voi lyödä korttia.
+Kymppi kaataa numerokortit 9, 8, 7, 6, 5, 4 ja 3.
+Kymppiä ei voi kaataa.
+Kympin voi lyödä numerokorttien päälle.
+Kuvallista korttia K, Q, tai J, ei voi lyödä pöytään ennen kuin numerokortit on kaadettu ainakin kerran kympillä.
+Tyhjään pöytään lyöty kymppi on nostettava pöydästä.
+Kun pöydän kortit on kaadettu kympillä, vuoro ei vaihdu.
 
-Ässä, 14 = Ässän päälle ei voi lyödä korttia. Ässä kaataa kuvakortit K, Q ja J. Tyhjään pöytään lyöty ässä on nostettava pöydästä. Kun pöydän kortit on kaadettu ässällä, vuoro ei vaihdu.
+Ässä = 14
+Ässän päälle ei voi lyödä korttia.
+Ässä kaataa kuvakortit K, Q ja J.
+Ässää ei voi kaataa.
+Ässän voi lyödä kuvakorttien päälle.
+Tyhjään pöytään lyöty ässä on nostettava pöydästä.
+Kun pöydän kortit on kaadettu ässällä, vuoro ei vaihdu.
 
 Muut kortit
-Numerokortit = 9, 8, 7, 6, 5, 4, 3. Numerokortin päälle ei voi lyödä pienempää numerokorttia.
+Numerokortit = 9, 8, 7, 6, 5, 4, 3
+Numerokortin päälle ei voi lyödä pienempää numerokorttia.
 Numerokortin päälle voi lyödä samansuuruisen tai suuremman numerokortin.
 Kuvakortin voi lyödä numerokortin päälle kun pöydän numerokortit on ainakin kerran kaadettu kympillä.
 
-Kuvakortit = K, Q, J. Kuvakortin päälle ei voi lyödä numerokorttia eikä pienempää kuvakorttia.
+Kuvakortit = K, Q, J
+Kuvakortin päälle ei voi lyödä numerokorttia eikä pienempää kuvakorttia.
 Kuvakortin päälle voi lyödä samansuuruisen tai suuremman kuvakortin.
 
 Korttien suuruusjärjestys
@@ -42,13 +62,19 @@ Pelin tavoite
 Pelin tavoitteena on päästä ensimmäisenä pelaajana eroon omista korteistaan.
 
 Jako
-Tietokone luo pakan ja sekoittaa sen. Tämän jälkeen tietokone jakaa vuorotellen yhden kortin pakan päältä kuvapuoli alaspäin ensin pelaajalle ja sitten itselleen kunnes molemmilla on seitsemän korttia. Sekä tietokone, että pelaaja järjestää omat korttinsa käteen suuruusjärjestykseen. Omia kortteja ei näytetä.
+Peli luo pakan ja sekoittaa sen.
+Tämän jälkeen pelaajalle ja tietokoneelle jaetaan kortit pakasta.
+Pelaajan kortit järjestetään automaattisesti suuruusjärjestykseen pienimmästä suurimpaan.
 
 Käsi
-Kädessä on aina seitsemän korttia, ellei ole joutunut nostamaan pöydästä kortteja käteen tai ellei pakasta ole kortit loppuneet. Jos kädessä on enemmän kuin seitsemän korttia, ei pakasta nosteta korttia käteen.
+Kädessä on aina seitsemän korttia, ellei ole joutunut nostamaan pöydästä kortteja käteen tai ellei pakasta ole kortit loppuneet.
+Jos kädessä on enemmän kuin seitsemän korttia, ei pakasta nosteta korttia käteen.
 
 Lyöminen
-Sekä pelaaja, että tietokone voivat lyödä vain yhden kortin kerrallaan pöytään vuorollaan joko kädestään tai pakan päältä. Kun pelaaja on lyönyt tai nostanut, vuoro vaihtuu tietokoneelle. Kun tietokone on lyönyt tai nostanut, vuoro vaihtuu pelaajalle. Jos kuitenkin pelaaja tai tietokone on kaatanut pöydän kortit kympillä tai ässällä, vuoro ei vaihdu.
+Sekä pelaaja, että tietokone voivat lyödä vain yhden kortin kerrallaan pöytään vuorollaan joko kädestään tai pakan päältä.
+Kun pelaaja on lyönyt tai nostanut, vuoro vaihtuu tietokoneelle.
+Kun tietokone on lyönyt tai nostanut, vuoro vaihtuu pelaajalle.
+Jos kuitenkin pelaaja tai tietokone on kaatanut pöydän kortit kympillä tai ässällä, vuoro ei vaihdu.
 
 Pakka
 Pakan päällimmäisen kortin voi lyödä omalla vuorollaan pöytään jos pakassa on kortteja jäljellä.
@@ -61,11 +87,18 @@ Jos kädessä tai pakan päällä ei ole pöytään lyötäväksi kelpaavaa kort
 Pelin kulku:
 
 Pelin aloittaminen
-Peli alkaa kun hiiren painikkeella klikataan pöydän, eli pelikentän, keskellä olevaa aloitusnappia. Peli alkaa pelaajan vuorolla.
+Peli alkaa kun hiiren painikkeella klikataan pöydän, eli pelikentän, keskellä olevaa aloitusnappia.
+Peli alkaa pelaajan vuorolla.
 
 Pelikenttä
-Lyödyt kortit ilmestyvät pelikentän keskelle. Pöydän oikealle puolelle ilmestyvät kaadetut kortit kuvapuoli alaspäin.
-Kaadetut kortit ovat pöydästä kympillä tai ässällä kaadettuja kortteja. Pöydän vasemmalla puolella on pakka. Pakan kortit ovat kuvapuoli alaspäin. Pelikentän yläosaan ilmestyy pyörivä CPU-merkki aina kun vuoro on tietokoneella. Pelikentän alaosassa ovat pelaajan käden kortit. Tietokoneen käden kortit eivät näy pelaajalle.
+Lyödyt kortit ilmestyvät pelikentän keskelle.
+Pöydän oikealle puolelle ilmestyvät kaadetut kortit kuvapuoli alaspäin.
+Kaadetut kortit ovat pöydästä kympillä tai ässällä kaadettuja kortteja.
+Pöydän vasemmalla puolella on pakka.
+Pakan kortit ovat kuvapuoli alaspäin.
+Pelikentän yläosaan ilmestyy pyörivä CPU-merkki aina kun vuoro on tietokoneella.
+Pelikentän alaosassa ovat pelaajan käden kortit.
+Tietokoneen käden kortit eivät näy pelaajalle.
 
 Lyöminen ja automaattinen nosto
 Kortin lyömisen jälkeen sekä pelaajan, että tietokoneen käteen nousee automaattisesti pakasta yksi kortti siten, että kädessä on aina seitsemän korttia kunnes pakassa ei ole enää kortteja jäljellä.
