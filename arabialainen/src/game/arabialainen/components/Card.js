@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { PILE_TABLE } from '../constants/constants'
 import '../styles/theme/light/Card.css'
+import '../styles/theme/light/Discard.css'
 
 class Card extends Component {
   constructor(props) {
@@ -21,6 +22,14 @@ class Card extends Component {
       />
     )
   }
+  createDiscardImg(styleStr) {
+    return (
+      <div className={'Discard-card'}
+        style={{ transform: styleStr }}>
+        arabialainen
+      </div>
+    )
+  }
   handleHitCard() {
     this.props.hitCard(this.props.code, this.props.pile, PILE_TABLE)
   }
@@ -37,6 +46,9 @@ class Card extends Component {
         )}
         {pile === 'playerPile' && (
           this.createImg(image, name, 'Card', this.handleHitCard, '')
+        )}
+        {pile === 'discardPile' && (
+          this.createDiscardImg(this._transform)
         )}
         {pile === 'tablePile' && (
           this.createImg(image, name, 'Card-table', null, this._transform)
