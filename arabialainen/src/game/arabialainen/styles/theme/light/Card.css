@@ -1,7 +1,12 @@
 .Card:hover {
-  margin-bottom: 5px;
+  margin-bottom: 20px;
+  transition: 500ms margin-bottom ease-out;
 }
 .Card-table {
   position: absolute;
   top: 20vh;
+}
+.Card-table:hover {
+  margin-top: 20px;
+  transition: 500ms margin-top ease-out;
 }

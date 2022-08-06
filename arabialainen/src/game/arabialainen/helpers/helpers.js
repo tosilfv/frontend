@@ -46,12 +46,12 @@ export async function checkPile(deckId, codes, fromPile, toPile) {
     await removeFromPile(deckId, codes, fromPile)
   }
 }
-export function createCard(c, hitFn, pileName) {
+export function createCard(c, clickFn, pileName) {
   return (
     <Card
       key={c.code}
       code={c.code}
-      hitCard={hitFn}
+      clickCard={clickFn}
       image={c.image}
       name={`${c.value} of ${c.suit}`}
       pile={pileName}
