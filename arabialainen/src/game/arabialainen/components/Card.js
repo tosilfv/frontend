@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { PILE_TABLE } from '../constants/constants'
+import { PILE_PLAYER, PILE_TABLE } from '../constants/constants'
 import '../styles/theme/light/Card.css'
 import '../styles/theme/light/Discard.css'
 
@@ -7,6 +7,7 @@ class Card extends Component {
   constructor(props) {
     super(props)
     this.handleHitCard = this.handleHitCard.bind(this)
+    this.handlePickTableCards = this.handlePickTableCards.bind(this)
     const randNum = Math.random() * 90 - 45
     const [ angle, x, y ] = [ randNum, randNum, randNum ]
     this._transform = `translate(${x}px, ${y}px) rotate(${angle}deg)`
@@ -31,7 +32,10 @@ class Card extends Component {
     )
   }
   handleHitCard() {
-    this.props.hitCard(this.props.code, this.props.pile, PILE_TABLE)
+    this.props.clickCard(this.props.code, this.props.pile, PILE_TABLE)
+  }
+  handlePickTableCards() {
+    this.props.clickCard()
   }
   render() {
     const {
@@ -51,7 +55,7 @@ class Card extends Component {
           this.createDiscardImg(this._transform)
         )}
         {pile === 'tablePile' && (
-          this.createImg(image, name, 'Card-table', null, this._transform)
+          this.createImg(image, name, 'Card-table', this.handlePickTableCards, this._transform)
         )}
       </div>
     )

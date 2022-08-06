@@ -29,4 +29,5 @@
 }
 .Deck-pick:hover {
   margin-left: 20px;
+  transition: 500ms margin-left ease-out;
 }

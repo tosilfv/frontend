@@ -51,18 +51,18 @@ export async function getDeck() {
     caughtError('getDeck', error)
   }
 }
-export function mapPile(pileState, hitFn, pileName) {
+export function mapPile(pileState, clickFn, pileName) {
   if (pileName === PILE_DISCARD) {
     return pileState.map((c) => createCard(c, '', pileName))
   }
   if (pileName === PILE_TABLE) {
-    return pileState.map((c) => createCard(c, '', pileName))
+    return pileState.map((c) => createCard(c, clickFn, pileName))
   }
   if (pileName === PILE_CPU) {
-    return pileState.map((c) => createCard(c, hitFn, pileName))
+    return pileState.map((c) => createCard(c, clickFn, pileName))
   } else {
     const pileSorted = sortPile(pileState)
-    return pileSorted.map((c) => createCard(c, hitFn, pileName))
+    return pileSorted.map((c) => createCard(c, clickFn, pileName))
   }
 }
 export function nameCard(c) {
