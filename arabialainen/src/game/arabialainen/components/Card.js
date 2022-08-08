@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { PILE_PLAYER, PILE_TABLE } from '../constants/constants'
+import { PILE_TABLE } from '../constants/constants'
 import '../styles/theme/light/Card.css'
 import '../styles/theme/light/Discard.css'
 
@@ -35,7 +35,7 @@ class Card extends Component {
     this.props.clickCard(this.props.code, this.props.pile, PILE_TABLE)
   }
   handlePickTableCards() {
-    this.props.clickCard()
+    this.props.clickCard('')
   }
   render() {
     const {
