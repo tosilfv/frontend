@@ -28,11 +28,13 @@ import '../styles/theme/light/Discard.css'
 import '../styles/theme/light/Player.css'
 import '../styles/theme/light/Table.css'
 import axios from 'axios'
+let checkedCardsSetCpu = new Set()
 
 class GameEngine extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      cpuDidPickTable: false,
       cpuPile: [],
       deckId: null,
       deckVisibility: 'hidden',
@@ -55,7 +57,9 @@ class GameEngine extends Component {
   }
   async componentDidUpdate() {
     if (this.state.turn === 'cpu') {
-      this.hitCpuCard()
+      if (!this.state.cpuDidPickTable) {
+        this.hitCpuCard()
+      }
     }
   }
   async drawCard(toPile) {
@@ -64,104 +68,225 @@ class GameEngine extends Component {
   async hitCpuCard() {
     if (this.state.turn === 'cpu') {
       let deckCardCode = null
+      let discardCard = null
       let pileResCpu = null
       let pileResTable = null
-      // select random card from cpu pile
       let randNum = Math.floor(Math.random() * this.state.cpuPile.length)
-      let cpuCardCode = this.state.cpuPile[randNum].code
+      let cpuCard = this.state.cpuPile[randNum]
+      let cpuCardCode = cpuCard.code
       // name cpu card
-      // let namedCard = nameCard(this.state.cpuPile[randNum])
-      // let cpuCardName = namedCard.sortName
+      let namedCard = nameCard(cpuCard)
+      let cpuCardName = namedCard.sortName
       // check cpu card
-      // if (!this.checkCard(cpuCardName)) {
-      // console.log('cannot hit cpu card: ', cpuCardName)
-      // }
-      // call api to draw from cpu pile
-      try {
-        const pileRes = await axios.get(
-          `${API_BASE}${this.state.deckId}/pile/${PILE_CPU}/draw/?cards=${cpuCardCode}`
-        )
-        if (!pileRes.data.success) {
-          throw new Error(`Error: cannot draw card from ${PILE_CPU}.`)
+      const cardOk = this.checkCard(cpuCardName)
+      if (cardOk) {
+        if (cpuCardName === '10' || cpuCardName === '14') {
+          discardCard = true
         }
-      } catch (error) {
-        throw new Error(`Cannot draw card error: ${error}.`)
-      }
-      // call api to add card to table pile
-      try {
-        const pileRes = await axios.get(
-          `${API_BASE}${this.state.deckId}/pile/${PILE_TABLE}/add/?cards=${cpuCardCode}`
-        )
-        if (!pileRes.data.success) {
-          throw new Error(`Error: cannot add card to ${PILE_TABLE}.`)
+        // call api to draw from cpu pile
+        try {
+          const pileRes = await axios.get(
+            `${API_BASE}${this.state.deckId}/pile/${PILE_CPU}/draw/?cards=${cpuCardCode}`
+          )
+          if (!pileRes.data.success) {
+            throw new Error(`Error: cannot draw card from ${PILE_CPU}.`)
+          }
+        } catch (error) {
+          throw new Error(`Cannot draw card error: ${error}.`)
         }
-      } catch (error) {
-        throw new Error(`Cannot add card error: ${error}.`)
-      }
-      // call api to remove card from deck
-      try {
-        const pileRes = await axios.get(
-          `${API_BASE}${this.state.deckId}/draw/?count=${DRAW_ONE}`
-        )
-        if (!pileRes.data.success) {
-          throw new Error(`Error: cannot draw card from deck ${this.state.deckId} for cpu.`)
+        // call api to add card to table pile
+        try {
+          const pileRes = await axios.get(
+            `${API_BASE}${this.state.deckId}/pile/${PILE_TABLE}/add/?cards=${cpuCardCode}`
+          )
+          if (!pileRes.data.success) {
+            throw new Error(`Error: cannot add card to ${PILE_TABLE}.`)
+          }
+        } catch (error) {
+          throw new Error(`Cannot add card error: ${error}.`)
         }
-        // save card code
-        deckCardCode = pileRes.data.cards[0].code
-      } catch (error) {
-        throw new Error(`Cannot draw card from deck for cpu error: ${error}.`)
-      }
-      // call api to add card to cpu pile
-      try {
-        const pileRes = await axios.get(
-          `${API_BASE}${this.state.deckId}/pile/${PILE_CPU}/add/?cards=${deckCardCode}`
-        )
-        if (!pileRes.data.success) {
-          throw new Error(`Error: cannot add card to ${PILE_CPU}.`)
+        if (this.state.cpuPile.length <= DRAW_INIT) {
+          // call api to remove card from deck
+          try {
+            const pileRes = await axios.get(
+              `${API_BASE}${this.state.deckId}/draw/?count=${DRAW_ONE}`
+            )
+            if (!pileRes.data.success) {
+              throw new Error(`Error: cannot draw card from deck ${this.state.deckId} for cpu.`)
+            }
+            // save card code
+            deckCardCode = pileRes.data.cards[0].code
+          } catch (error) {
+            throw new Error(`Cannot draw card from deck for cpu error: ${error}.`)
+          }
+          // call api to add card to cpu pile
+          try {
+            const pileRes = await axios.get(
+              `${API_BASE}${this.state.deckId}/pile/${PILE_CPU}/add/?cards=${deckCardCode}`
+            )
+            if (!pileRes.data.success) {
+              throw new Error(`Error: cannot add card to ${PILE_CPU}.`)
+            }
+          } catch (error) {
+            throw new Error(`Cannot add card for cpu error: ${error}.`)
+          }
         }
-      } catch (error) {
-        throw new Error(`Cannot add card for cpu error: ${error}.`)
-      }
-      // call api to list table pile
-      try {
-        pileResTable = await axios.get(
-          `${API_BASE}${this.state.deckId}/pile/${PILE_TABLE}/list/`
-        )
-        if (!pileResTable.data.success) {
-          throw new Error(`Error: cannot list cards for ${PILE_TABLE}.`)
+        // call api to list table pile
+        try {
+          pileResTable = await axios.get(
+            `${API_BASE}${this.state.deckId}/pile/${PILE_TABLE}/list/`
+          )
+          if (!pileResTable.data.success) {
+            throw new Error(`Error: cannot list cards for ${PILE_TABLE}.`)
+          }
+        } catch (error) {
+          throw new Error(`Cannot list cards error: ${error}.`)
         }
-      } catch (error) {
-        throw new Error(`Cannot list cards error: ${error}.`)
-      }
-      // call api to list cpu pile
-      try {
-        pileResCpu = await axios.get(
-          `${API_BASE}${this.state.deckId}/pile/${PILE_CPU}/list/`
-        )
-        if (!pileResCpu.data.success) {
-          throw new Error(`Error: cannot list cards for ${PILE_CPU}.`)
+        // call api to list cpu pile
+        try {
+          pileResCpu = await axios.get(
+            `${API_BASE}${this.state.deckId}/pile/${PILE_CPU}/list/`
+          )
+          if (!pileResCpu.data.success) {
+            throw new Error(`Error: cannot list cards for ${PILE_CPU}.`)
+          }
+        } catch (error) {
+          throw new Error(`Cannot list cards error: ${error}.`)
         }
-        // change turn to player
-        // set state for cpu and table
-        // set spinloader timeout from 100 to 3000 ms
-        let randNum = Math.floor(Math.random() * 31) * 100 // ms
-        setTimeout(() => {
+        // discardCard && add table pile to discard pile
+        if (discardCard) {
+          checkedCardsSetCpu.clear()
+          this.discardTableCpu(cpuCardCode, PILE_CPU, PILE_TABLE, pileResCpu, pileResTable)
+        } else {
+          // set state for cpu and table
+          // this.setState({
+          //   [PILE_CPU]: pileResCpu.data.piles[PILE_CPU].cards,
+          //   [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards,
+          //   cpuDidPickTable: false
+          // })
+          checkedCardsSetCpu.clear()
+          // change turn to player
           this.setState({
             [PILE_CPU]: pileResCpu.data.piles[PILE_CPU].cards,
             [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards,
+            cpuDidPickTable: false,
             spinAmount: 1,
             spinVisibility: 'hidden',
             turn: 'player'
           })
-        }, randNum);
-      } catch (error) {
-        throw new Error(`Cannot list cards error: ${error}.`)
+        }
+      } else {
+        checkedCardsSetCpu.add(cpuCard)
+        if (checkedCardsSetCpu.size < this.state.cpuPile.length) {
+          this.hitCpuCard()
+        } else {
+          // if all cpu cards are checked
+          checkedCardsSetCpu.clear()
+          this.pickFromDeckCpu()
+        }
       }
     }
+    // if (this.state.turn === 'cpu') {
+    //   let deckCardCode = null
+    //   let pileResCpu = null
+    //   let pileResTable = null
+    //   // select random card from cpu pile
+    //   let randNum = Math.floor(Math.random() * this.state.cpuPile.length)
+    //   let cpuCardCode = this.state.cpuPile[randNum].code
+    //   // name cpu card
+    //   // let namedCard = nameCard(this.state.cpuPile[randNum])
+    //   // let cpuCardName = namedCard.sortName
+    //   // check cpu card
+    //   // if (!this.checkCard(cpuCardName)) {
+    //   // console.log('cannot hit cpu card: ', cpuCardName)
+    //   // }
+    //   // call api to draw from cpu pile
+    //   try {
+    //     const pileRes = await axios.get(
+    //       `${API_BASE}${this.state.deckId}/pile/${PILE_CPU}/draw/?cards=${cpuCardCode}`
+    //     )
+    //     if (!pileRes.data.success) {
+    //       throw new Error(`Error: cannot draw card from ${PILE_CPU}.`)
+    //     }
+    //   } catch (error) {
+    //     throw new Error(`Cannot draw card error: ${error}.`)
+    //   }
+    //   // call api to add card to table pile
+    //   try {
+    //     const pileRes = await axios.get(
+    //       `${API_BASE}${this.state.deckId}/pile/${PILE_TABLE}/add/?cards=${cpuCardCode}`
+    //     )
+    //     if (!pileRes.data.success) {
+    //       throw new Error(`Error: cannot add card to ${PILE_TABLE}.`)
+    //     }
+    //   } catch (error) {
+    //     throw new Error(`Cannot add card error: ${error}.`)
+    //   }
+    //   // call api to remove card from deck
+    //   try {
+    //     const pileRes = await axios.get(
+    //       `${API_BASE}${this.state.deckId}/draw/?count=${DRAW_ONE}`
+    //     )
+    //     if (!pileRes.data.success) {
+    //       throw new Error(`Error: cannot draw card from deck ${this.state.deckId} for cpu.`)
+    //     }
+    //     // save card code
+    //     deckCardCode = pileRes.data.cards[0].code
+    //   } catch (error) {
+    //     throw new Error(`Cannot draw card from deck for cpu error: ${error}.`)
+    //   }
+    //   // call api to add card to cpu pile
+    //   try {
+    //     const pileRes = await axios.get(
+    //       `${API_BASE}${this.state.deckId}/pile/${PILE_CPU}/add/?cards=${deckCardCode}`
+    //     )
+    //     if (!pileRes.data.success) {
+    //       throw new Error(`Error: cannot add card to ${PILE_CPU}.`)
+    //     }
+    //   } catch (error) {
+    //     throw new Error(`Cannot add card for cpu error: ${error}.`)
+    //   }
+    //   // call api to list table pile
+    //   try {
+    //     pileResTable = await axios.get(
+    //       `${API_BASE}${this.state.deckId}/pile/${PILE_TABLE}/list/`
+    //     )
+    //     if (!pileResTable.data.success) {
+    //       throw new Error(`Error: cannot list cards for ${PILE_TABLE}.`)
+    //     }
+    //   } catch (error) {
+    //     throw new Error(`Cannot list cards error: ${error}.`)
+    //   }
+    //   // call api to list cpu pile
+    //   try {
+    //     pileResCpu = await axios.get(
+    //       `${API_BASE}${this.state.deckId}/pile/${PILE_CPU}/list/`
+    //     )
+    //     if (!pileResCpu.data.success) {
+    //       throw new Error(`Error: cannot list cards for ${PILE_CPU}.`)
+    //     }
+    //     // change turn to player
+    //     // set state for cpu and table
+    //     // set spinloader timeout from 100 to 3000 ms
+    //     let randNum = Math.floor(Math.random() * 31) * 100 // ms
+    //     setTimeout(() => {
+    //       this.setState({
+    //         [PILE_CPU]: pileResCpu.data.piles[PILE_CPU].cards,
+    //         [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards,
+    //         spinAmount: 1,
+    //         spinVisibility: 'hidden',
+    //         turn: 'player'
+    //       })
+    //     }, randNum);
+    //   } catch (error) {
+    //     throw new Error(`Cannot list cards error: ${error}.`)
+    //   }
+    // }
   }
   async hitPlayerCard(code, fromPile, toPile) {
     if (this.state.turn === 'player') {
       let deckCardCode = null
+      let discardCard = null
       let pileResPlayer = null
       let pileResTable = null
       let clickedCard = this.state.playerPile.find(c => c.code === code)
@@ -169,90 +294,98 @@ class GameEngine extends Component {
       let namedCard = nameCard(clickedCard)
       let playerCardName = namedCard.sortName
       // check player card
-      const discardCard = this.checkCard(playerCardName)
-      // call api to draw from player pile
-      try {
-        const pileRes = await axios.get(
-          `${API_BASE}${this.state.deckId}/pile/${fromPile}/draw/?cards=${code}`
-        )
-        if (!pileRes.data.success) {
-          throw new Error(`Error: cannot draw card from ${fromPile}.`)
+      const cardOk = this.checkCard(playerCardName)
+      if (cardOk) {
+        if (playerCardName === '10' || playerCardName === '14') {
+          discardCard = true
         }
-      } catch (error) {
-        throw new Error(`Cannot draw card error: ${error}.`)
-      }
-      // call api to add card to table pile
-      try {
-        const pileRes = await axios.get(
-          `${API_BASE}${this.state.deckId}/pile/${toPile}/add/?cards=${code}`
-        )
-        if (!pileRes.data.success) {
-          throw new Error(`Error: cannot add card to ${toPile}.`)
+        // call api to draw from player pile
+        try {
+          const pileRes = await axios.get(
+            `${API_BASE}${this.state.deckId}/pile/${fromPile}/draw/?cards=${code}`
+          )
+          if (!pileRes.data.success) {
+            throw new Error(`Error: cannot draw card from ${fromPile}.`)
+          }
+        } catch (error) {
+          throw new Error(`Cannot draw card error: ${error}.`)
         }
-      } catch (error) {
-        throw new Error(`Cannot add card error: ${error}.`)
-      }
-      // call api to remove card from deck
-      try {
-        const pileRes = await axios.get(
-          `${API_BASE}${this.state.deckId}/draw/?count=${DRAW_ONE}`
-        )
-        if (!pileRes.data.success) {
-          throw new Error(`Error: cannot draw card from deck ${this.state.deckId} for player.`)
+        // call api to add card to table pile
+        try {
+          const pileRes = await axios.get(
+            `${API_BASE}${this.state.deckId}/pile/${toPile}/add/?cards=${code}`
+          )
+          if (!pileRes.data.success) {
+            throw new Error(`Error: cannot add card to ${toPile}.`)
+          }
+        } catch (error) {
+          throw new Error(`Cannot add card error: ${error}.`)
         }
-        // save card code
-        deckCardCode = pileRes.data.cards[0].code
-      } catch (error) {
-        throw new Error(`Cannot draw card from deck for player error: ${error}.`)
-      }
-      // call api to add card to player pile
-      try {
-        const pileRes = await axios.get(
-          `${API_BASE}${this.state.deckId}/pile/${fromPile}/add/?cards=${deckCardCode}`
-        )
-        if (!pileRes.data.success) {
-          throw new Error(`Error: cannot add card to ${fromPile}.`)
+        if (this.state.playerPile.length <= DRAW_INIT) {
+          // call api to remove card from deck
+          try {
+            const pileRes = await axios.get(
+              `${API_BASE}${this.state.deckId}/draw/?count=${DRAW_ONE}`
+            )
+            if (!pileRes.data.success) {
+              throw new Error(`Error: cannot draw card from deck ${this.state.deckId} for player.`)
+            }
+            // save card code
+            deckCardCode = pileRes.data.cards[0].code
+          } catch (error) {
+            throw new Error(`Cannot draw card from deck for player error: ${error}.`)
+          }
+          // call api to add card to player pile
+          try {
+            const pileRes = await axios.get(
+              `${API_BASE}${this.state.deckId}/pile/${fromPile}/add/?cards=${deckCardCode}`
+            )
+            if (!pileRes.data.success) {
+              throw new Error(`Error: cannot add card to ${fromPile}.`)
+            }
+          } catch (error) {
+            throw new Error(`Cannot add card for player error: ${error}.`)
+          }
         }
-      } catch (error) {
-        throw new Error(`Cannot add card for player error: ${error}.`)
-      }
-      // call api to list table pile
-      try {
-        pileResTable = await axios.get(
-          `${API_BASE}${this.state.deckId}/pile/${toPile}/list/`
-        )
-        if (!pileResTable.data.success) {
-          throw new Error(`Error: cannot list cards for ${toPile}.`)
+        // call api to list table pile
+        try {
+          pileResTable = await axios.get(
+            `${API_BASE}${this.state.deckId}/pile/${toPile}/list/`
+          )
+          if (!pileResTable.data.success) {
+            throw new Error(`Error: cannot list cards for ${toPile}.`)
+          }
+        } catch (error) {
+          throw new Error(`Cannot list cards error: ${error}.`)
         }
-      } catch (error) {
-        throw new Error(`Cannot list cards error: ${error}.`)
-      }
-      // call api to list player pile
-      try {
-        pileResPlayer = await axios.get(
-          `${API_BASE}${this.state.deckId}/pile/${fromPile}/list/`
-        )
-        if (!pileResPlayer.data.success) {
-          throw new Error(`Error: cannot list cards for ${fromPile}.`)
+        // call api to list player pile
+        try {
+          pileResPlayer = await axios.get(
+            `${API_BASE}${this.state.deckId}/pile/${fromPile}/list/`
+          )
+          if (!pileResPlayer.data.success) {
+            throw new Error(`Error: cannot list cards for ${fromPile}.`)
+          }
+          // change turn to cpu
+          // set state for player and table
+          this.setState({
+            [fromPile]: pileResPlayer.data.piles[fromPile].cards,
+            [toPile]: pileResTable.data.piles[toPile].cards
+          })
+        } catch (error) {
+          throw new Error(`Cannot list cards error: ${error}.`)
         }
-        // change turn to cpu
-        // set state for player and table
-        this.setState({
-          [fromPile]: pileResPlayer.data.piles[fromPile].cards,
-          [toPile]: pileResTable.data.piles[toPile].cards
-        })
-      } catch (error) {
-        throw new Error(`Cannot list cards error: ${error}.`)
-      }
-      // discardCard && add table pile to discard pile
-      if (discardCard) {
-        this.discardTable(code, fromPile, toPile, pileResPlayer, pileResTable)
-      } else {
-        this.setState({
-          spinAmount: 'infinite',
-          spinVisibility: 'visible',
-          turn: 'cpu'
-        })
+        // discardCard && add table pile to discard pile
+        if (discardCard) {
+          this.discardTable(code, fromPile, toPile, pileResPlayer, pileResTable)
+        } else {
+          this.setState({
+            cpuDidPickTable: false,
+            spinAmount: 'infinite',
+            spinVisibility: 'visible',
+            turn: 'cpu'
+          })
+        }
       }
     }
   }
@@ -312,6 +445,63 @@ class GameEngine extends Component {
       [PILE_DISCARD]: pileResDiscard.data.piles[PILE_DISCARD].cards
     })
   }
+  async discardTableCpu(code, fromPile, toPile, pileResCpu, pileResTable) {
+    let pileResDiscard = null
+    const tableCards = createCardArray(this.state.tablePile)
+    // add discardCard code to tableCards
+    tableCards.push(code)
+    // call api to draw from table pile
+    try {
+      const pileRes = await axios.get(
+        `${API_BASE}${this.state.deckId}/pile/${PILE_TABLE}/draw/?cards=${tableCards}`
+      )
+      if (!pileRes.data.success) {
+        throw new Error(`Error: cannot draw card from ${PILE_TABLE}.`)
+      }
+    } catch (error) {
+      throw new Error(`Cannot draw card error: ${error}.`)
+    }
+    // call api to add table cards to discard pile
+    try {
+      const pileRes = await axios.get(
+        `${API_BASE}${this.state.deckId}/pile/${PILE_DISCARD}/add/?cards=${tableCards.toString()}`
+      )
+      if (!pileRes.data.success) {
+        throw new Error(`Error: cannot add card to ${PILE_DISCARD}.`)
+      }
+    } catch (error) {
+      throw new Error(`Cannot add card error: ${error}.`)
+    }
+    // call api to list table pile
+    try {
+      pileResTable = await axios.get(
+        `${API_BASE}${this.state.deckId}/pile/${toPile}/list/`
+      )
+      if (!pileResTable.data.success) {
+        throw new Error(`Error: cannot list cards for ${toPile}.`)
+      }
+    } catch (error) {
+      throw new Error(`Cannot list cards error: ${error}.`)
+    }
+    // call api to list discard pile
+    try {
+      pileResDiscard = await axios.get(
+        `${API_BASE}${this.state.deckId}/pile/${PILE_DISCARD}/list/`
+      )
+      if (!pileResDiscard.data.success) {
+        throw new Error(`Error: cannot list cards for ${PILE_DISCARD}.`)
+      }
+    } catch (error) {
+      throw new Error(`Cannot list cards error: ${error}.`)
+    }
+    // set state for cpu, table and discard pile
+    this.setState({
+      [fromPile]: pileResCpu.data.piles[fromPile].cards,
+      [toPile]: pileResTable.data.piles[toPile].cards,
+      [PILE_DISCARD]: pileResDiscard.data.piles[PILE_DISCARD].cards,
+      cpuDidPickTable: false
+    })
+  }
   async initGame() {
     this.setState({
       deckVisibility: 'visible',
@@ -332,18 +522,13 @@ class GameEngine extends Component {
     const cards = await getCards(this.state.deckId, pile)
     this.setState({ [pile]: cards })
   }
-  checkCard(card) {
-    if (this.state.tablePile.length > 0) {
-      const tableCard = this.state.tablePile[this.state.tablePile.length - 1].sortName
-      const canHit = this.checkRules(tableCard, card)
-      return canHit
-    }
-  }
-  async pickTableCardsCpu() {
+  async pickTableCardsCpu(code) {
     if (this.state.turn === 'cpu') {
       let pileResCpu = null
       let pileResTable = null
       const tableCards = createCardArray(this.state.tablePile)
+      // add picked card code to tableCards
+      tableCards.push(code)
       // call api to draw from table pile
       try {
         const pileRes = await axios.get(
@@ -389,18 +574,27 @@ class GameEngine extends Component {
         throw new Error(`Cannot list cards error: ${error}.`)
       }
       // set state for cpu and table pile
-      this.setState({
-        [PILE_CPU]: pileResCpu.data.piles[PILE_CPU].cards,
-        [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards,
-        turn: 'player'
-      })
+      // set spinloader timeout from 100 to 3000 ms
+      // let randNum = Math.floor(Math.random() * 31) * 100 // ms
+      // setTimeout(() => {
+        this.setState({
+          [PILE_CPU]: pileResCpu.data.piles[PILE_CPU].cards,
+          [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards,
+          cpuDidPickTable: true,
+          spinAmount: 1,
+          spinVisibility: 'hidden',
+          turn: 'player'
+        })
+      // }, randNum);
     }
   }
-  async pickTableCards() {
+  async pickTableCards(code) {
     if (this.state.turn === 'player') {
       let pileResPlayer = null
       let pileResTable = null
       const tableCards = createCardArray(this.state.tablePile)
+      // add picked card code to tableCards
+      tableCards.push(code)
       // call api to draw from table pile
       try {
         const pileRes = await axios.get(
@@ -456,11 +650,100 @@ class GameEngine extends Component {
     }
   }
   async pickFromDeckCpu() {
-    if (this.state.turn === 'cpu') {}
+    if (this.state.turn === 'cpu') {
+      let deckCard = null
+      let deckCardCode = null
+      let pileResCpu = null
+      let pileResTable = null
+      // call api to remove card from deck
+      try {
+        const pileRes = await axios.get(
+          `${API_BASE}${this.state.deckId}/draw/?count=${DRAW_ONE}`
+        )
+        if (!pileRes.data.success) {
+          throw new Error(`Error: cannot pick a card from deck ${this.state.deckId} for cpu.`)
+        }
+        // save card
+        deckCard = pileRes.data.cards[0]
+        // save card code
+        deckCardCode = pileRes.data.cards[0].code
+      } catch (error) {
+        throw new Error(`Cannot pick a card from deck for cpu error: ${error}.`)
+      }
+      // call api to add card to table pile
+      try {
+        const pileRes = await axios.get(
+          `${API_BASE}${this.state.deckId}/pile/${PILE_TABLE}/add/?cards=${deckCardCode}`
+        )
+        if (!pileRes.data.success) {
+          throw new Error(`Error: cannot add card to ${PILE_TABLE}.`)
+        }
+      } catch (error) {
+        throw new Error(`Cannot add card for table error: ${error}.`)
+      }
+      // call api to list cpu pile
+      try {
+        pileResCpu = await axios.get(
+          `${API_BASE}${this.state.deckId}/pile/${PILE_CPU}/list/`
+        )
+        if (!pileResCpu.data.success) {
+          throw new Error(`Error: cannot list cards for ${PILE_CPU}.`)
+        }
+      } catch (error) {
+        throw new Error(`Cannot list cards error: ${error}.`)
+      }
+      // call api to list table pile
+      try {
+        pileResTable = await axios.get(
+          `${API_BASE}${this.state.deckId}/pile/${PILE_TABLE}/list/`
+        )
+        if (!pileResTable.data.success) {
+          throw new Error(`Error: cannot list cards for ${PILE_TABLE}.`)
+        }
+      } catch (error) {
+        throw new Error(`Cannot list cards error: ${error}.`)
+      }
+      // name cpu card
+      let namedCard = nameCard(deckCard)
+      let cpuCardName = namedCard.sortName
+      const cardOk = this.checkCard(cpuCardName)
+      if (cardOk) {
+        if (cpuCardName === '10' || cpuCardName === '14') {
+          if (this.state.tablePile.length > 0) {
+            // discardCard && add table pile to discard pile
+            this.discardTable(deckCardCode, PILE_CPU, PILE_TABLE, pileResCpu, pileResTable)
+          } else {
+            this.setState({
+              [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards,
+              cpuDidPickTable: false,
+              spinAmount: 1,
+              spinVisibility: 'hidden',
+              turn: 'player'
+            })
+          }
+        } else {
+          this.setState({
+            [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards,
+            cpuDidPickTable: false,
+            spinAmount: 1,
+            spinVisibility: 'hidden',
+            turn: 'player'
+          })
+        }
+      } else {
+        this.pickTableCardsCpu(deckCardCode)
+      }
+      // set state for table pile
+      // this.setState({
+      //   [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards
+      // })
+    }
   }
   async pickFromDeck() {
     if (this.state.turn === 'player') {
+      let deckCard = null
       let deckCardCode = null
+      let pileResPlayer = null
       let pileResTable = null
       // call api to remove card from deck
       try {
@@ -470,6 +753,8 @@ class GameEngine extends Component {
         if (!pileRes.data.success) {
           throw new Error(`Error: cannot pick a card from deck ${this.state.deckId} for player.`)
         }
+        // save card
+        deckCard = pileRes.data.cards[0]
         // save card code
         deckCardCode = pileRes.data.cards[0].code
       } catch (error) {
@@ -486,6 +771,17 @@ class GameEngine extends Component {
       } catch (error) {
         throw new Error(`Cannot add card for table error: ${error}.`)
       }
+      // call api to list player pile
+      try {
+        pileResPlayer = await axios.get(
+          `${API_BASE}${this.state.deckId}/pile/${PILE_PLAYER}/list/`
+        )
+        if (!pileResPlayer.data.success) {
+          throw new Error(`Error: cannot list cards for ${PILE_PLAYER}.`)
+        }
+      } catch (error) {
+        throw new Error(`Cannot list cards error: ${error}.`)
+      }
       // call api to list table pile
       try {
         pileResTable = await axios.get(
@@ -497,107 +793,149 @@ class GameEngine extends Component {
       } catch (error) {
         throw new Error(`Cannot list cards error: ${error}.`)
       }
-      // set state for player and table pile
+      // set state for table pile
       this.setState({
-        [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards,
-        spinAmount: 'infinite',
-        spinVisibility: 'visible',
-        turn: 'cpu'
+        [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards
       })
+      // name player card
+      let namedCard = nameCard(deckCard)
+      let playerCardName = namedCard.sortName
+      const cardOk = this.checkCard(playerCardName)
+      if (cardOk) {
+        if (playerCardName === '10' || playerCardName === '14') {
+          if (this.state.tablePile.length > 0) {
+            // discardCard && add table pile to discard pile
+            this.discardTable(deckCardCode, PILE_PLAYER, PILE_TABLE, pileResPlayer, pileResTable)
+          } else {
+            this.setState({
+              cpuDidPickTable: false,
+              spinAmount: 'infinite',
+              spinVisibility: 'visible',
+              turn: 'cpu'
+            })
+          }
+        } else {
+          this.setState({
+            cpuDidPickTable: false,
+            spinAmount: 'infinite',
+            spinVisibility: 'visible',
+            turn: 'cpu'
+          })
+        }
+      } else {
+        this.pickTableCards(deckCardCode)
+      }
     }
   }
-  checkRules(tableCard, card) {
-    // const tableValue = Number(tableCard)
-    // const cardValue = Number(card)
-    // // number cards
-    // if (tableValue >= 3 && tableValue <= 9) {
-    //   if (cardValue >= 3 && cardValue <= 9) {
-    //     if (tableValue > cardValue) {
-    //       throw new Error(`Cannot hit a smaller number card: ${card} on top of a bigger number card: ${tableCard}.`)
-    //     }
-    //   }
-    //   if (cardValue === 14) {
-    //     throw new Error(`Cannot hit ace: ${card} on top of a number card: ${tableCard}.`)
-    //   }
-    // }
-    // // picture cards
-    // if (tableValue >= 11 && tableValue <= 13) {
-    //   if (cardValue >= 11 && cardValue <= 13) {
-    //     if (tableValue > cardValue) {
-    //       throw new Error(`Cannot hit a smaller picture card: ${card} on top of a bigger picture card: ${tableCard}.`)
-    //     }
-    //   }
-    //   if (cardValue >= 3 && cardValue <= 9) {
-    //     throw new Error(`Cannot hit a number card: ${card} on top of a picture card: ${tableCard}.`)
-    //   }
-    // }
-    // // twos
-    // if (tableValue === 2) {
-    //   if (cardValue === 10) {
-    //     throw new Error(`Cannot hit a ten: ${card} on top a two: ${tableCard}.`)
-    //   }
-    //   if (cardValue === 14) {
-    //     throw new Error(`Cannot hit an ace: ${card} on top a two: ${tableCard}.`)
-    //   }
-    // }
-    // if (tableValue === 10 || tableValue === 14 || tableValue === 15) {
-    //   if (cardValue === 2) {
-    //     throw new Error(`Cannot hit a two: ${card} on top a different special card: ${tableCard}.`)
-    //   }
-    // }
-    // // tens
-    // if (tableValue === 10) {
-    //   throw new Error(`Cannot hit any card on top of a ten: ${tableCard}.`)
-    // }
-    // if (tableValue >= 3 && tableValue <= 9) {
-    //   // use ten to discard table pile
-    //   if (cardValue === 10) {
-    //     return true
-    //   }
-    // }
-    // // aces
-    // if (tableValue === 14) {
-    //   throw new Error(`Cannot hit any card on top of an ace: ${tableCard}.`)
-    // }
-    // if (tableValue >= 11 && tableValue <= 13) {
-    //   // use ace to discard table pile
-    //   if (cardValue === 14) {
-    //     return true
-    //   }
-    // }
-    // // jokers
-    // if (tableValue === 15) {
-    //   if (cardValue !== 15) {
-    //     if (tableValue > cardValue) {
-    //       throw new Error(`Cannot hit any other card on top of a joker, except another joker: ${tableCard}.`)
-    //     }
-    //   }
-    // }
-
-// Kädessä on aina seitsemän korttia, ellei ole joutunut nostamaan pöydästä kortteja käteen tai ellei pakasta ole kortit loppuneet.
-// Jos kädessä on enemmän kuin seitsemän korttia, ei pakasta nosteta korttia käteen.
-
-// tens
-  // Tyhjään pöytään lyöty kymppi on nostettava pöydästä.
-  // Kuvallista korttia K, Q, tai J, ei voi lyödä pöytään ennen kuin numerokortit on kaadettu ainakin kerran kympillä.
-// aces
-  // Tyhjään pöytään lyöty ässä on nostettava pöydästä.
-// number cards
-  // Kuvakortin voi lyödä numerokortin päälle kun pöydän numerokortit on ainakin kerran kaadettu kympillä.
-// 2
-  // Kakkosta ei voi kaataa.
-  // Tyhjään pöytään lyötyä kakkosta ei tarvitse nostaa pöydästä.
-// joker
-  // Jokeria ei voi kaataa.
-  // Tyhjään pöytään lyötyä jokeria ei tarvitse nostaa pöydästä jos sen päälle voi lyödä jokerin, muussa tapauksessa tyhjään pöytään lyödyn jokerin joutuu nostamaan pöydästä.
-// other
-  // pick table cards to hand
-    // Kun pelaaja on nostanut, vuoro vaihtuu tietokoneelle. Kun tietokone on nostanut, vuoro vaihtuu pelaajalle.
-  // discard cards
-    // Jos pelaaja tai tietokone on kaatanut pöydän kortit kympillä tai ässällä, vuoro ei vaihdu.
-  // try a card from top of the deck
-    // Pakan päällimmäisen kortin voi lyödä omalla vuorollaan pöytään jos pakassa on kortteja jäljellä. Jos pakasta pöytään lyöty kortti ei ole pöytään lyötäväksi kelpaava, joutuu pöydän kortit nostamaan käteen.
+  checkCard(card) {
+    if (this.state.tablePile.length > 0) {
+      const tableCard = this.state.tablePile[this.state.tablePile.length - 1].sortName
+      return this.checkRules(tableCard, card) 
+    }
+    return true
   }
+  checkRules(tableCard, card) {
+    const tableValue = Number(tableCard)
+    const cardValue = Number(card)
+    // number cards
+    if (tableValue >= 3 && tableValue <= 9) {
+      if (cardValue >= 3 && cardValue <= 9) {
+        if (tableValue > cardValue) {
+          console.log(`Cannot hit a smaller number card: ${card} on top of a bigger number card: ${tableCard}.`)
+          return false
+        }
+      }
+      if (cardValue === 14) {
+        console.log(`Cannot hit ace: ${card} on top of a number card: ${tableCard}.`)
+        return false
+      }
+    }
+    // picture cards
+    if (tableValue >= 11 && tableValue <= 13) {
+      if (cardValue >= 11 && cardValue <= 13) {
+        if (tableValue > cardValue) {
+          console.log(`Cannot hit a smaller picture card: ${card} on top of a bigger picture card: ${tableCard}.`)
+          return false
+        }
+      }
+      if (cardValue >= 3 && cardValue <= 9) {
+        console.log(`Cannot hit a number card: ${card} on top of a picture card: ${tableCard}.`)
+        return false
+      }
+      if (cardValue === 10) {
+        console.log(`Cannot hit a ten: ${card} on top of a picture card: ${tableCard}.`)
+        return false
+      }
+    }
+    // twos
+    if (tableValue === 2) {
+      if (cardValue === 10) {
+        console.log(`Cannot hit a ten: ${card} on top a two: ${tableCard}.`)
+        return false
+      }
+      if (cardValue === 14) {
+        console.log(`Cannot hit an ace: ${card} on top a two: ${tableCard}.`)
+        return false
+      }
+    }
+    if (tableValue === 10 || tableValue === 14 || tableValue === 15) {
+      if (cardValue === 2) {
+        console.log(`Cannot hit a two: ${card} on top a different special card: ${tableCard}.`)
+        return false
+      }
+    }
+    // tens
+    if (tableValue === 10) {
+      console.log(`Cannot hit any card on top of a ten: ${tableCard}.`)
+      return false
+    }
+    if (tableValue >= 3 && tableValue <= 9) {
+      // use ten to discard table pile
+      if (cardValue === 10) {
+        return true
+      }
+    }
+    // aces
+    if (tableValue === 14) {
+      console.log(`Cannot hit any card on top of an ace: ${tableCard}.`)
+      return false
+    }
+    if (tableValue >= 11 && tableValue <= 13) {
+      // use ace to discard table pile
+      if (cardValue === 14) {
+        return true
+      }
+    }
+    // jokers
+    if (tableValue === 15) {
+      if (cardValue !== 15) {
+        if (tableValue > cardValue) {
+          console.log(`Cannot hit any other card on top of a joker, except another joker: ${tableCard}.`)
+          return false
+        }
+      }
+    }
+    return true
+  }
+
+// tietokone
+// Tyhjään pöytään lyöty kymppi on nostettava pöydästä.
+// Tyhjään pöytään lyöty ässä on nostettava pöydästä, myös pakasta lyöty.
+// Kakkosta ei voi kaataa.
+// Tyhjään pöytään lyötyä kakkosta ei tarvitse nostaa pöydästä.
+// Tyhjään pöytään lyötyä jokeria ei tarvitse nostaa pöydästä jos sen päälle voi lyödä jokerin, muussa tapauksessa tyhjään pöytään lyödyn jokerin joutuu nostamaan pöydästä.
+// Kun tietokone on nostanut, vuoro vaihtuu pelaajalle.
+// Jos pakasta pöytään lyöty kortti ei ole pöytään lyötäväksi kelpaava, joutuu pöydän kortit nostamaan käteen.
+
+// pelin lopetus
+// Kädessä on aina seitsemän korttia, ellei pakasta ole kortit loppuneet.
+
+// kympillä kaato
+// Kuvallista korttia K, Q, tai J, ei voi lyödä pöytään ennen kuin numerokortit on kaadettu ainakin kerran kympillä.
+// Kuvakortin voi lyödä numerokortin päälle kun pöydän numerokortit on ainakin kerran kaadettu kympillä.
+
+// muut
+// disable deck until player cards are loaded
 
   render() {
     // player clicked a player card
