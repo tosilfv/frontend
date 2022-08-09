@@ -11,11 +11,7 @@ Big thanks goes to Colt Steele, whose React course on Udemy had a card game exam
 ## Design decisions
 This project uses the Deck of Cards API from https://deckofcardsapi.com/
 The folder and file structure has been created with expandability in mind.
-Basically all central files are in the game\arabialainen folder. The first version is written using Class components (Old React).
-
-## Other, miscellaneous
-v1: This game is still a work in progress containing only the bare necessities and no rules are applied.
-v11: Cpu loader fixed.
+Basically all central files are in the game\arabialainen folder. The game is written using Class components (Old React).
 
 ## Known errors
 E1. When player repeatedly clicks own cards, axios errors appear.
