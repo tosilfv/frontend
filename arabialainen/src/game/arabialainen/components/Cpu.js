@@ -14,7 +14,9 @@ class Cpu extends Component {
             animationIterationCount: spinAmount,
             visibility: spinVisibility
           }}
-        >cpu</div>
+        >
+          cpu
+        </div>
       </div>
     )
   }
