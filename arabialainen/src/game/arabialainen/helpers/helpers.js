@@ -7,13 +7,13 @@ import {
   JOKERS_ENABLED,
   PILE_CPU,
   PILE_DISCARD,
-  PILE_TABLE
+  PILE_TABLE,
+  TURN_PLAYER
 } from '../constants/constants'
 
-export async function addToPile(deckId, codes, fromPile, toPile) {
+export async function addToPile(deckId, codes, pile) {
   try {
-    await checkPile(deckId, codes, fromPile, toPile)
-    const pileRes = await apiGet(deckId, codes, '', toPile, 'addToPile')
+    const pileRes = await apiGet(deckId, codes, '', pile, 'addToPile')
     apiResponse('hitCard pileRes', pileRes, '')
   } catch (error) {
     caughtError('addToPile', error)
@@ -23,21 +23,19 @@ export async function apiGet(deckId, codes, numCards, pile, gameFn) {
   switch (gameFn) {
   case 'addToPile':
     return await axios.get(
-      `${API_BASE}${deckId}/pile/${pile}/add/?cards=${codes}`
-    )
+      `${API_BASE}${deckId}/pile/${pile}/add/?cards=${codes}`)
   case 'drawFromDeck':
-    return await axios.get(`${API_BASE}${deckId}/draw/?count=${numCards}`)
+    return await axios.get(
+      `${API_BASE}${deckId}/draw/?count=${numCards}`)
+  case 'drawFromPile':
+    return await axios.get(
+      `${API_BASE}${deckId}/pile/${pile}/draw/?cards=${codes}`)
   case 'getCards':
-    return await axios.get(`${API_BASE}${deckId}/pile/${pile}/list/`)
+    return await axios.get(
+      `${API_BASE}${deckId}/pile/${pile}/list/`)
   case 'getDeck':
     return await axios.get(
-      `${API_BASE}new/shuffle/?deck_count=${DECK_COUNT}
-            &jokers_enabled=${JOKERS_ENABLED}`
-    )
-  case 'removeFromPile':
-    return await axios.get(
-      `${API_BASE}${deckId}/pile/${pile}/draw/?cards=${codes}`
-    )
+      `${API_BASE}new/shuffle/?deck_count=${DECK_COUNT}&jokers_enabled=${JOKERS_ENABLED}`)
   default:
     break
   }
@@ -51,11 +49,6 @@ export function apiResponse(gameFn, apiRes, retVal) {
 }
 export function caughtError(gameFn, error) {
   throw new Error(`${gameFn} error: ${error}`)
-}
-export async function checkPile(deckId, codes, fromPile, toPile) {
-  if (toPile === PILE_TABLE && codes !== '') {
-    await removeFromPile(deckId, codes, fromPile)
-  }
 }
 export function createCard(c, clickFn, pileName) {
   return (
@@ -78,24 +71,26 @@ export function createCardArray(cards) {
   }
   return pileCardArray
 }
-export async function drawFromDeck(deckId, numCards, toPile) {
+export async function drawFromDeck(deckId, numCards) {
   try {
     const pileRes = await apiGet(deckId, '', numCards, '', 'drawFromDeck')
-    apiResponse('drawFromDeck pileRes', pileRes, '')
-    const pileCardArray = createCardArray(pileRes.data.cards)
-    return addToPile(deckId, pileCardArray.toString(), '', toPile)
+    return apiResponse('drawFromDeck pileRes', pileRes, pileRes)
   } catch (error) {
     caughtError('drawFromDeck', error)
+  }
+}
+export async function drawFromPile(deckId, codes, fromPile) {
+  try {
+    const pileRes = await apiGet(deckId, codes, '', fromPile, 'drawFromPile')
+    apiResponse('drawFromPile', pileRes, '')
+  } catch (error) {
+    caughtError('drawFromPile', error)
   }
 }
 export async function getCards(deckId, pile) {
   try {
     const pileRes = await apiGet(deckId, '', '', pile, 'getCards')
-    return apiResponse(
-      'getCards pileRes',
-      pileRes,
-      pileRes.data.piles[pile].cards
-    )
+    return apiResponse('getCards pileRes', pileRes, pileRes)
   } catch (error) {
     caughtError('getCards', error)
   }
@@ -120,6 +115,11 @@ export function mapPile(pileState, clickFn, pileName) {
   } else {
     const pileSorted = sortPile(pileState)
     return pileSorted.map((c) => createCard(c, clickFn, pileName))
+  }
+}
+export async function message(message, turn) {
+  if (turn === TURN_PLAYER) {
+    console.log(message)
   }
 }
 export function nameCard(c) {
@@ -177,14 +177,6 @@ export function namePileCards(pile) {
     return c
   })
   return pileCardsNamed
-}
-export async function removeFromPile(deckId, codes, fromPile) {
-  try {
-    const pileRes = await apiGet(deckId, codes, '', fromPile, 'removeFromPile')
-    apiResponse('removeFromPile', pileRes, '')
-  } catch (error) {
-    caughtError('removeFromPile', error)
-  }
 }
 export function sortPile(pile) {
   const pileWillSort = namePileCards(pile)

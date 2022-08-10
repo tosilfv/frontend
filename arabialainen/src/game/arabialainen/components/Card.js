@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 import {
+  PILE_CPU,
+  PILE_DISCARD,
   PILE_PLAYER,
   PILE_TABLE
 } from '../constants/constants'
@@ -28,13 +30,14 @@ class Card extends Component {
   createDiscardImg(styleStr) {
     return (
       <div className={'Card-discard'}
-        style={{ transform: styleStr }}>
+        style={{ transform: styleStr }}
+      >
         arabialainen
       </div>
     )
   }
   handleHitCard() {
-    this.props.clickCard(this.props.code, this.props.pile, PILE_TABLE)
+    this.props.clickCard(this.props.code, this.props.pile)
   }
   handlePickTableCards() {
     this.props.clickCard('', PILE_PLAYER)
@@ -47,17 +50,18 @@ class Card extends Component {
     } = this.props
     return (
       <div>
-        {pile === 'cpuPile' && (
-          this.createImg(image, name, 'Card', this.handleHitCard, '')
+        {(pile === PILE_CPU || pile === PILE_PLAYER) && (
+          this.createImg(
+            image, name, 'Card', this.handleHitCard, ''
+          )
         )}
-        {pile === 'playerPile' && (
-          this.createImg(image, name, 'Card', this.handleHitCard, '')
+        {pile === PILE_TABLE && (
+          this.createImg(
+            image, name, 'Card-table', this.handlePickTableCards, this._transform
+          )
         )}
-        {pile === 'discardPile' && (
+        {pile === PILE_DISCARD && (
           this.createDiscardImg(this._transform)
-        )}
-        {pile === 'tablePile' && (
-          this.createImg(image, name, 'Card-table', this.handlePickTableCards, this._transform)
         )}
       </div>
     )
