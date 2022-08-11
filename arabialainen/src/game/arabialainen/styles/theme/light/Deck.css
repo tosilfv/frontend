@@ -5,10 +5,10 @@
   color: #fff;
   filter: opacity(0.97) drop-shadow(1px 1px 1px #004f9c);
   height: 280px;
-  letter-spacing: 5px;
+  letter-spacing: 3px;
   position: absolute;
   text-align: center;
-  text-indent: 5px;
+  text-indent: 4px;
   text-transform: uppercase;
   user-select: none;
   width: 192px;
@@ -20,7 +20,7 @@
   color: #fff;
   filter: opacity(0.97) drop-shadow(1px 1px 1px #004f9c);
   height: 280px;
-  letter-spacing: 5px;
+  letter-spacing: 4px;
   text-align: center;
   text-indent: 5px;
   text-transform: uppercase;

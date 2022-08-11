@@ -45,6 +45,7 @@ class GameEngine extends Component {
       deckId: null,
       deckVisibility: HIDDEN,
       discardPile: [],
+      message: '',
       playerPile: [],
       spinAmount: 1,
       spinVisibility: HIDDEN,
@@ -62,6 +63,7 @@ class GameEngine extends Component {
       checkedCardsSetCpu.clear()
       this.setState({
         canPickFromDeck: true,
+        message: '',
         spinAmount: 1,
         spinVisibility: HIDDEN,
         turn: TURN_PLAYER
@@ -72,6 +74,7 @@ class GameEngine extends Component {
         canPickFromDeck: false,
         cpuDidhitCard: false,
         cpuDidPickTable: false,
+        message: '',
         spinAmount: INFINITE,
         spinVisibility: VISIBLE,
         turn: TURN_CPU
@@ -81,7 +84,22 @@ class GameEngine extends Component {
   checkCard(card) {
     if (this.state.tablePile.length > 0) {
       const tableCard = this.state.tablePile[this.state.tablePile.length - 1].sortName
-      return checkRules(tableCard, card, this.state.turn)
+      let message = checkRules(tableCard, card)
+      if (this.state.turn === TURN_PLAYER) {
+        if (typeof message === 'string') {
+          this.setState({ message })
+          return false
+        } else {
+          return message
+        }
+      }
+      if (this.state.turn === TURN_CPU) {
+        if (typeof message === 'boolean') {
+          return message
+        } else {
+          return false
+        }
+      }
     }
     return true
   }
@@ -310,9 +328,6 @@ class GameEngine extends Component {
 // pelin lopetus
 // Kädessä on aina seitsemän korttia, ellei pakasta ole kortit loppuneet.
 
-// Ilmoitukset
-// Pelikentän vasempaan yläkulmaan ilmestyy pelin aikana viesti viimeisimmästä pelitapahtumasta.
-
   render() {
     const playerPileSorted = sortPile(this.state.playerPile)
     const playerCards = playerPileSorted.map((c) =>
@@ -326,6 +341,7 @@ class GameEngine extends Component {
           pickTableCards={this.pickTableCards}
           deckVisibility={this.state.deckVisibility}
           discardPile={this.state.discardPile}
+          message={this.state.message}
           spinAmount={this.state.spinAmount}
           spinVisibility={this.state.spinVisibility}
           startButton={this.state.startButton}

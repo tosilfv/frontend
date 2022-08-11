@@ -9,6 +9,10 @@
   width: 100vw;
   z-index: 0;
 }
+.Table-info {
+  display: flex;
+  width: 100%;
+}
 .Table-piles {
   align-items: flex-start;
   display: flex;

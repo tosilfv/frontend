@@ -7,8 +7,7 @@ import {
   JOKERS_ENABLED,
   PILE_CPU,
   PILE_DISCARD,
-  PILE_TABLE,
-  TURN_PLAYER
+  PILE_TABLE
 } from '../constants/constants'
 
 export async function addToPile(deckId, codes, pile) {
@@ -115,11 +114,6 @@ export function mapPile(pileState, clickFn, pileName) {
   } else {
     const pileSorted = sortPile(pileState)
     return pileSorted.map((c) => createCard(c, clickFn, pileName))
-  }
-}
-export async function message(message, turn) {
-  if (turn === TURN_PLAYER) {
-    console.log(message)
   }
 }
 export function nameCard(c) {

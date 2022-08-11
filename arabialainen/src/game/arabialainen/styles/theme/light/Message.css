@@ -1,0 +1,9 @@
+.Message {
+  align-items: center;
+  background-color: #fff;
+  display: flex;
+  font-size: 20px;
+  font-weight: 900;
+  margin: 10px;
+  text-align: center;
+}
