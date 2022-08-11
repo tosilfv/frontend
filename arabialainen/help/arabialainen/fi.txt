@@ -109,6 +109,6 @@ Oikeassakin elämässä voi pelissä huijata esimerkiksi silloin, kun siitä ei 
 Lisäksi tietokoneen kokeilu pakasta on poissa käytöstä.
 
 Ilmoitukset
-Pelikentän vasempaan yläkulmaan ilmestyy pelin aikana viesti viimeisimmästä pelitapahtumasta.
+Pelikentän vasempaan yläkulmaan ilmestyy pelin aikana viesti viimeisimmästä pelitapahtumasta, jos se vaatii pelaajan huomiota.
 
 Hauskoja pelihetkiä!

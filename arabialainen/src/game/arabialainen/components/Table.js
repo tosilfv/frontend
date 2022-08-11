@@ -5,15 +5,17 @@ import Cpu from './Cpu'
 import Deck from './Deck'
 import Discard from './Discard'
 import '../styles/theme/light/Table.css'
+import Message from './Message'
 
 class Table extends Component {
   render() {
     const {
+      initGame,
       pickFromDeck,
       pickTableCards,
       deckVisibility,
       discardPile,
-      initGame,
+      message,
       spinAmount,
       spinVisibility,
       startButton,
@@ -21,10 +23,13 @@ class Table extends Component {
     } = this.props
     return (
       <div className="Table">
-        <Cpu
-          spinAmount={spinAmount}
-          spinVisibility={spinVisibility}
-        />
+        <div className='Table-info'>
+          <Message message={message} />
+          <Cpu
+            spinAmount={spinAmount}
+            spinVisibility={spinVisibility}
+          />
+        </div>
         <div className="Table-piles">
           <Deck
             deckVisibility= {deckVisibility}
