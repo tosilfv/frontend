@@ -13,6 +13,7 @@ class Table extends Component {
       initGame,
       pickFromDeck,
       pickTableCards,
+      cardsRemaining,
       deckVisibility,
       discardPile,
       message,
@@ -32,7 +33,8 @@ class Table extends Component {
         </div>
         <div className="Table-piles">
           <Deck
-            deckVisibility= {deckVisibility}
+            cardsRemaining={cardsRemaining}
+            deckVisibility={deckVisibility}
             pickFromDeck={pickFromDeck}
           />
         </div>
