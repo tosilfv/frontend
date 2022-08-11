@@ -11,20 +11,31 @@ class Deck extends Component {
     return this.props.pickFromDeck(PILE_PLAYER)
   }
   render() {
-    const { deckVisibility } = this.props
+    const {
+      cardsRemaining,
+      deckVisibility
+    } = this.props
     return (
       <div>
-        <div className="Deck"
-          style={{ visibility: deckVisibility }}
-          >
-            arabialainen
-        </div>
-        <div className="Deck-pick"
-          onClick={this.handlePickFromDeck}
-          style={{ visibility: deckVisibility }}
-          >
-            arabialainen
-        </div>
+        {cardsRemaining === 0 ? (
+          <div></div>
+        ):(
+          <div className="Deck"
+            style={{ visibility: deckVisibility }}
+            >
+              arabialainen
+          </div>
+        )}
+        {cardsRemaining >= 1 ? (
+          <div className="Deck-pick"
+            onClick={this.handlePickFromDeck}
+            style={{ visibility: deckVisibility }}
+            >
+              arabialainen
+          </div>
+        ):(
+          <div></div>
+        )}
       </div>
     )
   }

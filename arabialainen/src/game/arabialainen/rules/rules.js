@@ -1,6 +1,12 @@
-export function checkRules(tableCard, card) {
+export function checkRules(tableCard, card, discardedByTen) {
   const tableValue = Number(tableCard)
   const cardValue = Number(card)
+  // discarded by ten
+  if (cardValue >= 11 && cardValue <= 13) {
+    if (!discardedByTen) {
+      return `Cannot hit a picture card before table cards are discarded by ten at least once.`
+    }
+  }
   // number cards
   if (tableValue >= 3 && tableValue <= 9) {
     if (cardValue >= 3 && cardValue <= 9) {
