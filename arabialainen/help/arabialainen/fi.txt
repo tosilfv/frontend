@@ -103,6 +103,11 @@ Tietokoneen käden kortit eivät näy pelaajalle.
 Lyöminen ja automaattinen nosto
 Kortin lyömisen jälkeen sekä pelaajan, että tietokoneen käteen nousee automaattisesti pakasta yksi kortti siten, että kädessä on aina seitsemän korttia kunnes pakassa ei ole enää kortteja jäljellä.
 
+Muut
+Pelaajalle on pelistrategian vuoksi jätetty mahdollisuus kokeilla pakasta kympin tai ässän päälle, vaikka se on säännöissä kielletty.
+Oikeassakin elämässä voi pelissä huijata esimerkiksi silloin, kun siitä ei jää kiinni.
+Lisäksi tietokoneen kokeilu pakasta on poissa käytöstä.
+
 Ilmoitukset
 Pelikentän vasempaan yläkulmaan ilmestyy pelin aikana viesti viimeisimmästä pelitapahtumasta.
 
