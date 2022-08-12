@@ -15,3 +15,4 @@ Basically all central files are in the game\arabialainen folder. The game is wri
 
 ## Known errors
 E1. When player repeatedly clicks own cards, axios errors appear.
+E2. When player hits a card from hand, there is approximately a 500[ms] - 1500[ms] delay before the card shows up on table.

@@ -16,16 +16,28 @@ class Card extends Component {
     const [ angle, x, y ] = [ randNum, randNum, randNum ]
     this._transform = `translate(${x}px, ${y}px) rotate(${angle}deg)`
   }
-  createImg(image, name, clName, clickFn, styleStr) {
-    return (
-      <img
-        className={clName}
-        src={image}
-        alt={name}
-        onClick={clickFn}
-        style={{ transform: styleStr }}
-      />
-    )
+  createImg(image, name, clName, clickFn, styleStr, disabled) {
+    if (disabled) {
+      return (
+        <img
+          className={clName}
+          src={image}
+          alt={name}
+          style={{ transform: styleStr }}
+          disabled
+        />
+      )
+    } else {
+      return (
+        <img
+          className={clName}
+          src={image}
+          alt={name}
+          onClick={clickFn}
+          style={{ transform: styleStr }}
+        />
+      )
+    }
   }
   createDiscardImg(styleStr) {
     return (
@@ -44,6 +56,7 @@ class Card extends Component {
   }
   render() {
     const {
+      disabled,
       image,
       name,
       pile
@@ -52,12 +65,12 @@ class Card extends Component {
       <div>
         {(pile === PILE_CPU || pile === PILE_PLAYER) && (
           this.createImg(
-            image, name, 'Card', this.handleHitCard, ''
+            image, name, 'Card', this.handleHitCard, '', disabled
           )
         )}
         {pile === PILE_TABLE && (
           this.createImg(
-            image, name, 'Card-table', this.handlePickTableCards, this._transform
+            image, name, 'Card-table', this.handlePickTableCards, this._transform, disabled
           )
         )}
         {pile === PILE_DISCARD && (
