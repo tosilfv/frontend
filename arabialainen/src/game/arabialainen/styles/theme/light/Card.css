@@ -14,8 +14,31 @@
   width: 192px;
 }
 .Card:hover {
-  margin-bottom: 20px;
-  transition: 500ms margin-bottom ease-out;
+  margin: 0 10px;
+  transition: 500ms margin ease-in-out;
+}
+.Card:active {
+  background-color: #07f;
+  box-shadow:
+  1px 0 1px #07f,
+  0 2px 2px #07f,
+  3px 0 3px #07f,
+  0 4px 4px #07f,
+  5px 0 5px #07f,
+  0 6px 10px #07f,
+  7px 0 15px #07f,
+  0 8px 20px #07f,
+  9px 0 25px #07f,
+  0 10px 45px #07f,
+  0 12px 55px #07f,
+  0 14px 65px #07f,
+  -11px 0 50px #07f,
+  0 -12px 55px #07f,
+  -13px 0 60px #07f,
+  0 -14px 65px #07f;
+  margin-bottom: 50px;
+  opacity: 0.9;
+  transition: 1000ms all ease-in-out;
 }
 .Card-table {
   position: absolute;

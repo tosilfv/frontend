@@ -49,19 +49,35 @@ export function apiResponse(gameFn, apiRes, retVal) {
 export function caughtError(gameFn, error) {
   throw new Error(`${gameFn} error: ${error}`)
 }
-export function createCard(c, clickFn, pileName) {
-  return (
-    <Card
-      key={c.code}
-      code={c.code}
-      clickCard={clickFn}
-      image={c.image}
-      name={`${c.value} of ${c.suit}`}
-      pile={pileName}
-      suit={c.suit}
-      value={c.value}
-    />
-  )
+export function createCard(c, clickFn, pileName, gameover) {
+  if (gameover) {
+    return (
+      <Card
+        key={c.code}
+        code={c.code}
+        clickCard={clickFn}
+        disabled={true}
+        image={c.image}
+        name={`${c.value} of ${c.suit}`}
+        pile={pileName}
+        suit={c.suit}
+        value={c.value}
+      />
+    )
+  } else {
+    return (
+      <Card
+        key={c.code}
+        code={c.code}
+        clickCard={clickFn}
+        image={c.image}
+        name={`${c.value} of ${c.suit}`}
+        pile={pileName}
+        suit={c.suit}
+        value={c.value}
+      />
+    )
+  }
 }
 export function createCardArray(cards) {
   const pileCardArray = []
@@ -102,18 +118,18 @@ export async function getDeck() {
     caughtError('getDeck', error)
   }
 }
-export function mapPile(pileState, clickFn, pileName) {
+export function mapPile(pileState, clickFn, pileName, gameover) {
   if (pileName === PILE_DISCARD) {
-    return pileState.map((c) => createCard(c, '', pileName))
+    return pileState.map((c) => createCard(c, '', pileName, gameover))
   }
   if (pileName === PILE_TABLE) {
-    return pileState.map((c) => createCard(c, clickFn, pileName))
+    return pileState.map((c) => createCard(c, clickFn, pileName, gameover))
   }
   if (pileName === PILE_CPU) {
-    return pileState.map((c) => createCard(c, clickFn, pileName))
+    return pileState.map((c) => createCard(c, clickFn, pileName, gameover))
   } else {
     const pileSorted = sortPile(pileState)
-    return pileSorted.map((c) => createCard(c, clickFn, pileName))
+    return pileSorted.map((c) => createCard(c, clickFn, pileName, gameover))
   }
 }
 export function nameCard(c) {

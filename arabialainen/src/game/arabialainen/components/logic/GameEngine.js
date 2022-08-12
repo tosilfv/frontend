@@ -19,15 +19,14 @@ import {
 } from '../../constants/constants'
 import {
   addToPile,
-  createCard,
   createCardArray,
   drawFromDeck,
   drawFromPile,
   getCards,
   getDeck,
+  mapPile,
   nameCard,
   namePileCards,
-  sortPile,
 } from '../../helpers/helpers'
 import { checkRules } from '../../rules/rules'
 import Player from '../Player'
@@ -41,14 +40,16 @@ class GameEngine extends Component {
     super(props)
     this.state = {
       canPickFromDeck: false,
-      cardsRemaining: null,
+      cardsRemaining: 2,
       cpuDidhitCard: false,
       cpuDidPickTable: false,
       cpuPile: [],
       deckId: null,
       deckVisibility: HIDDEN,
+      disableCards: false,
       discardedByTen: false,
       discardPile: [],
+      gameover: false,
       message: '',
       playerPile: [],
       spinAmount: 1,
@@ -63,10 +64,12 @@ class GameEngine extends Component {
     this.pickTableCards = this.pickTableCards.bind(this)
   }
   changeTurn() {
+    this.gameover()
     if (this.state.turn === TURN_CPU) {
       checkedCardsSetCpu.clear()
       this.setState({
         canPickFromDeck: true,
+        disableCards: false,
         message: '',
         spinAmount: 1,
         spinVisibility: HIDDEN,
@@ -108,6 +111,7 @@ class GameEngine extends Component {
     return true
   }
   async componentDidMount() {
+    // call api to get deckId
     const deckId = await getDeck()
     this.setState({ deckId })
   }
@@ -139,6 +143,11 @@ class GameEngine extends Component {
     pileResTable = await getCards(this.state.deckId, PILE_TABLE)
     // call api to list discard pile
     pileResDiscard = await getCards(this.state.deckId, PILE_DISCARD)
+    if (this.state.turn === TURN_PLAYER) {
+      this.setState({
+        disableCards: false
+      })
+    }
     this.setState({
       [fromPile]: pileRes.data.piles[fromPile].cards,
       [toPile]: pileResTable.data.piles[toPile].cards,
@@ -147,6 +156,16 @@ class GameEngine extends Component {
       cpuDidhitCard: false,
       cpuDidPickTable: false
     })
+  }
+  gameover() {
+    if (
+      (this.state.cpuPile.length === 0 ||
+      this.state.playerPile.length === 0) &&
+      this.state.cardsRemaining === 0) {
+        this.setState({
+          gameover: true
+        })
+      }
   }
   async hitCard(code, fromPile) {
     let card = null
@@ -169,6 +188,16 @@ class GameEngine extends Component {
     let cardName = namedCard.sortName
     const cardOk = this.checkCard(cardName)
     if (cardOk) {
+      if (this.state.turn === TURN_PLAYER) {
+        this.setState({
+          canPickFromDeck: false,
+          cpuDidhitCard: false,
+          cpuDidPickTable: false,
+          message: '',
+          spinAmount: INFINITE,
+          spinVisibility: VISIBLE,
+        })
+      }
       if (cardName === TEN || cardName === FOURTEEN) {
         discardCard = true
       }
@@ -197,36 +226,35 @@ class GameEngine extends Component {
             cpuDidhitCard: true
           })
         }
-        setTimeout(() => {
-          this.setState({
-            [fromPile]: pileRes.data.piles[fromPile].cards,
-            [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards,
-            canPickFromDeck: false,
-            cardsRemaining: cardsRemaining.data.remaining
-          })
-          if (discardCard) {
-            if (this.state.tablePile.length > 0) {
-              if (this.state.turn === TURN_CPU) {
-                checkedCardsSetCpu.clear()
-              }
-              if (cardName === TEN) {
-                this.setState({
-                  cardsRemaining: cardsRemaining.data.remaining,
-                  discardedByTen: true
-                })
-              }
-              this.discardTable(cardCode, fromPile, PILE_TABLE, pileRes, pileResTable)
-            } else {
-              this.setState({
-                canPickFromDeck: false,
-                cardsRemaining: cardsRemaining.data.remaining
-              })
-              this.changeTurn()
+        this.setState({
+          [fromPile]: pileRes.data.piles[fromPile].cards,
+          [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards,
+          canPickFromDeck: false,
+          cardsRemaining: cardsRemaining.data.remaining,
+          disableCards: true
+        })
+        if (discardCard) {
+          if (this.state.tablePile.length > 0) {
+            if (this.state.turn === TURN_CPU) {
+              checkedCardsSetCpu.clear()
             }
+            if (cardName === TEN) {
+              this.setState({
+                cardsRemaining: cardsRemaining.data.remaining,
+                discardedByTen: true
+              })
+            }
+            this.discardTable(cardCode, fromPile, PILE_TABLE, pileRes, pileResTable)
           } else {
+            this.setState({
+              canPickFromDeck: false,
+              cardsRemaining: cardsRemaining.data.remaining
+            })
             this.changeTurn()
           }
-        }, 300)
+        } else {
+          this.changeTurn()
+        }
       } else {
         if (this.state.turn === TURN_CPU) {
           checkedCardsSetCpu.add(card)
@@ -280,6 +308,11 @@ class GameEngine extends Component {
         pileRes = await getCards(this.state.deckId, pile)
         // call api to list table pile
         pileResTable = await getCards(this.state.deckId, PILE_TABLE)
+        if (this.state.turn === TURN_PLAYER) {
+          this.setState({
+            disableCards: true
+          })
+        }
         if (this.state.turn === TURN_CPU) {
           this.setState({
             [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards,
@@ -337,15 +370,15 @@ class GameEngine extends Component {
     }
     this.setState({
       [pile]: pileRes.data.piles[pile].cards,
-      [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards
+      [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards,
+      disableCards: true
     })
     this.changeTurn()
   }
-
   render() {
-    const playerPileSorted = sortPile(this.state.playerPile)
-    const playerCards = playerPileSorted.map((c) =>
-      createCard(c, this.hitCard, PILE_PLAYER))
+    const playerCards = mapPile(
+      this.state.playerPile, this.hitCard, PILE_PLAYER, this.state.gameover
+    )
     namePileCards(this.state.tablePile)
     return (
       <div>
@@ -353,16 +386,23 @@ class GameEngine extends Component {
           initGame={this.initGame}
           pickFromDeck={this.pickFromDeck}
           pickTableCards={this.pickTableCards}
-          cardsRemaining= {this.state.cardsRemaining}
+          cardsRemaining={this.state.cardsRemaining}
+          cpuCardsLeft={this.state.cpuPile.length}
           deckVisibility={this.state.deckVisibility}
           discardPile={this.state.discardPile}
+          gameover={this.state.gameover}
           message={this.state.message}
+          playerCardsLeft={this.state.playerPile.length}
           spinAmount={this.state.spinAmount}
           spinVisibility={this.state.spinVisibility}
           startButton={this.state.startButton}
           tablePile={this.state.tablePile}
         />
-        <Player playerCards={playerCards} />
+        <Player
+          disableCards={this.state.disableCards}
+          playerCards={playerCards}
+          playerCardsLeft={this.state.playerPile.length}
+        />
       </div>
     )
   }
@@ -370,5 +410,7 @@ class GameEngine extends Component {
 
 export default GameEngine
 
-// if no cards on deck, computer has turn, computer has no card to hit, player has cards
-// game ending screen
+// when first card of the game is hit, it cannot be a picture card
+// cannot hit a picture card on empty table before cards have been discarded by ten
+// cannot start a new game after a game is over
+// cpu cannot win

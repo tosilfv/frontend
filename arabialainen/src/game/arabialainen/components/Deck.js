@@ -17,25 +17,32 @@ class Deck extends Component {
     } = this.props
     return (
       <div>
-        {cardsRemaining === 0 ? (
+        {cardsRemaining === 0 &&
           <div></div>
-        ):(
-          <div className="Deck"
-            style={{ visibility: deckVisibility }}
-            >
-              arabialainen
-          </div>
-        )}
-        {cardsRemaining >= 1 ? (
+        }
+        {cardsRemaining === 1 &&
           <div className="Deck-pick"
             onClick={this.handlePickFromDeck}
             style={{ visibility: deckVisibility }}
             >
               arabialainen
           </div>
-        ):(
-          <div></div>
-        )}
+        }
+        {cardsRemaining > 1 &&
+          <div>
+            <div className="Deck"
+              style={{ visibility: deckVisibility }}
+              >
+                arabialainen
+            </div>
+            <div className="Deck-pick"
+              onClick={this.handlePickFromDeck}
+              style={{ visibility: deckVisibility }}
+              >
+                arabialainen
+            </div>
+          </div>
+        }
       </div>
     )
   }
