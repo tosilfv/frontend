@@ -70,7 +70,7 @@ class Card extends Component {
         )}
         {pile === PILE_TABLE && (
           this.createImg(
-            image, name, 'Card-table', this.handlePickTableCards, this._transform, disabled
+            image, name, 'Card Card-playfield', this.handlePickTableCards, this._transform, disabled
           )
         )}
         {pile === PILE_DISCARD && (
