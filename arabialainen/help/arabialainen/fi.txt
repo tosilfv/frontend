@@ -75,6 +75,7 @@ Sekä pelaaja, että tietokone voivat lyödä vain yhden kortin kerrallaan pöyt
 Kun pelaaja on lyönyt tai nostanut, vuoro vaihtuu tietokoneelle.
 Kun tietokone on lyönyt tai nostanut, vuoro vaihtuu pelaajalle.
 Jos kuitenkin pelaaja tai tietokone on kaatanut pöydän kortit kympillä tai ässällä, vuoro ei vaihdu.
+Pelin ensimmäistä korttia ei voi lyödä pakasta kokeilemalla.
 
 Pakka
 Pakan päällimmäisen kortin voi lyödä omalla vuorollaan pöytään jos pakassa on kortteja jäljellä.
@@ -102,13 +103,15 @@ Tietokoneen käden kortit eivät näy pelaajalle.
 
 Lyöminen ja automaattinen nosto
 Kortin lyömisen jälkeen sekä pelaajan, että tietokoneen käteen nousee automaattisesti pakasta yksi kortti siten, että kädessä on aina seitsemän korttia kunnes pakassa ei ole enää kortteja jäljellä.
+Tehtyjä toimintoja ei voi peruuttaa, esimerkiksi kortin lyömistä tai nostamista.
 
 Muut
 Pelaajalle on pelistrategian vuoksi jätetty mahdollisuus kokeilla pakasta kympin tai ässän päälle, vaikka se on säännöissä kielletty.
 Oikeassakin elämässä voi pelissä huijata esimerkiksi silloin, kun siitä ei jää kiinni.
-Lisäksi tietokoneen kokeilu pakasta on poissa käytöstä.
+Tietokoneen kokeilu pakasta on poissa käytöstä.
 
 Ilmoitukset
 Pelikentän vasempaan yläkulmaan ilmestyy pelin aikana viesti viimeisimmästä pelitapahtumasta, jos se vaatii pelaajan huomiota.
+Ilmoituksen voi poistaa klikkaamalla sitä, kun pelaajalla on vuoro.
 
 Hauskoja pelihetkiä!

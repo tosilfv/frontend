@@ -32,5 +32,6 @@
   overflow: visible;
   padding: 20px;
   text-transform: uppercase;
+  user-select: none;
   z-index: 2;
 }

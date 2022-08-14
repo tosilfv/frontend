@@ -14,7 +14,7 @@
   width: 192px;
 }
 .Card:hover {
-  margin: 0 10px;
+  margin: 10px 0;
   transition: 500ms margin ease-in-out;
 }
 .Card:active {
@@ -40,11 +40,11 @@
   opacity: 0.9;
   transition: 1000ms all ease-in-out;
 }
-.Card-table {
+.Card-playfield {
   position: absolute;
   top: 20vh;
 }
-.Card-table:hover {
-  margin-top: 20px;
-  transition: 500ms margin-top ease-out;
+.Card-playfield:active {
+  margin-top: 50px;
+  transition: 1000ms margin-top ease-out;
 }
