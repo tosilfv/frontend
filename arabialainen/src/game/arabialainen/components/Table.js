@@ -74,7 +74,7 @@ class Table extends Component {
           </div>
           <Discard discardPile={discardPile} />
           <div className="Table-playfield" disabled>
-            {mapPile(tablePile, pickTableCards, PILE_TABLE, gameover)}
+            {mapPile(tablePile, pickTableCards, PILE_TABLE, gameover, disableDeck)}
             <button
               style={{ visibility: VISIBLE }}
               onClick={this.handleNewGame}

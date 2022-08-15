@@ -1,12 +1,12 @@
 # Arabialainen-korttipeli, Arabialainen Card Game
-Suomenkieliset ohjeet löytyvät kansiosta help\arabialainen.<br />
-You will find the game instructions in the help\arabialainen folder in Finnish.
+Suomenkieliset ohjeet löytyvät kansiosta help/arabialainen.<br />
+You will find the game instructions in the help/arabialainen folder in Finnish.
 
 ## Install, start up, build, key folders
 Install dependencies by running the command npm install<br />
 Start the program by running the command npm start<br />
 Program can be built if necessary by running the command npm run build<br />
-All key folders can be found at game\arabialainen
+All key folders can be found at game/arabialainen
 
 ## Project Background
 I decided to start making this project without TDD as I haven't got the skills to do that yet.<br />
@@ -22,7 +22,5 @@ The folder and file structure has been created with expandability in mind.<br />
 The game is written using Class components (Old React).
 
 ## Known errors
-E1. When player repeatedly clicks own cards, axios errors appear.<br />
 E2. When player hits a card from hand, there is approximately a 500[ms] - 1500[ms] delay before the card shows up on table.<br />
-E3. During a delay of an event, if player clicks the deck or a table card, such an onclick event might be triggered.<br />
 E4. If there are no cards left on deck, table has not been discarded by ten, cpu has only court cards and player doesn't hit a ten, would result in a deadlock.
