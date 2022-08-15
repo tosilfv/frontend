@@ -23,7 +23,9 @@ class Deck extends Component {
             <div></div>
           }
           {cardsRemaining === 1 &&
-            <div style={{ visibility: deckVisibility }}
+            <div
+              className="Deck-pick"
+              style={{ visibility: deckVisibility }}
               >
                 arabialainen
             </div>

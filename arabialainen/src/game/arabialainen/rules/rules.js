@@ -1,54 +1,54 @@
-export function checkRules(tableCard, card, discardedByTen) {
-  const tableValue = Number(tableCard)
-  const cardValue = Number(card)
+export function checkRules(tableCardName, cardName, discardedByTen) {
+  const tableValue = Number(tableCardName)
+  const cardValue = Number(cardName)
   // discarded by ten
   if (cardValue >= 11 && cardValue <= 13) {
     if (!discardedByTen) {
-      return `Cannot hit a picture card before table cards are discarded by ten at least once.`
+      return `Cannot hit a court card (${cardName}) before table cards are discarded by ten (10) at least once.`
     }
   }
   // number cards
   if (tableValue >= 3 && tableValue <= 9) {
     if (cardValue >= 3 && cardValue <= 9) {
       if (tableValue > cardValue) {
-        return `Cannot hit a smaller number card: ${card} on top of a bigger number card: ${tableCard}.`
+        return `Cannot hit a smaller number card (${cardName}) on top of a bigger number card (${tableCardName}).`
       }
     }
     if (cardValue === 14) {
-      return `Cannot hit ace: ${card} on top of a number card: ${tableCard}.`
+      return `Cannot hit ace (${cardName}) on top of a number card (${tableCardName}).`
     }
   }
-  // picture cards
+  // court cards
   if (tableValue >= 11 && tableValue <= 13) {
     if (cardValue >= 11 && cardValue <= 13) {
       if (tableValue > cardValue) {
-        return `Cannot hit a smaller picture card: ${card} on top of a bigger picture card: ${tableCard}.`
+        return `Cannot hit a smaller court card (${cardName}) on top of a bigger court card (${tableCardName}).`
       }
     }
     if (cardValue >= 3 && cardValue <= 9) {
-      return `Cannot hit a number card: ${card} on top of a picture card: ${tableCard}.`
+      return `Cannot hit a number card (${cardName}) on top of a court card (${tableCardName}).`
     }
     if (cardValue === 10) {
-      return `Cannot hit a ten: ${card} on top of a picture card: ${tableCard}.`
+      return `Cannot hit a ten (${cardName}) on top of a court card (${tableCardName}).`
     }
   }
   // twos
   if (tableValue === 2) {
     if (cardValue === 10) {
-      return `Cannot hit a ten: ${card} on top a two: ${tableCard}.`
+      return `Cannot hit a ten (${cardName}) on top a two (${tableCardName}).`
     }
     if (cardValue === 14) {
-      return `Cannot hit an ace: ${card} on top a two: ${tableCard}.`
+      return `Cannot hit an ace (${cardName}) on top a two (${tableCardName}).`
     }
   }
   if (tableValue === 10 || tableValue === 14 || tableValue === 15) {
     if (cardValue === 2) {
-      return `Cannot hit a two: ${card} on top a different special card: ${tableCard}.`
+      return `Cannot hit a two (${cardName}) on top of a special card (${tableCardName}) that is other than two.`
     }
   }
   // tens
   if (tableValue === 10) {
-    return `Cannot hit any card on top of a ten: ${tableCard}.`
+    return `Cannot hit any card on top of a ten (${tableCardName}).`
   }
   if (tableValue >= 3 && tableValue <= 9) {
     // use ten to discard table pile
@@ -58,7 +58,7 @@ export function checkRules(tableCard, card, discardedByTen) {
   }
   // aces
   if (tableValue === 14) {
-    return `Cannot hit any card on top of an ace: ${tableCard}.`
+    return `Cannot hit any card on top of an ace (${tableCardName}).`
   }
   if (tableValue >= 11 && tableValue <= 13) {
     // use ace to discard table pile
@@ -70,7 +70,7 @@ export function checkRules(tableCard, card, discardedByTen) {
   if (tableValue === 15) {
     if (cardValue !== 15) {
       if (tableValue > cardValue) {
-        return `Cannot hit any other card on top of a joker, except another joker: ${tableCard}.`
+        return `Cannot hit any other card (${cardName}) on top of a joker (${tableCardName}), except another joker (${tableCardName}).`
       }
     }
   }
