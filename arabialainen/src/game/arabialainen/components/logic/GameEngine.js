@@ -171,7 +171,8 @@ class GameEngine extends Component {
       [toPile]: pileResTable.data.piles[toPile].cards,
       [PILE_DISCARD]: pileResDiscard.data.piles[PILE_DISCARD].cards,
       cpuDidhitCard: false,
-      cpuDidPickTable: false
+      cpuDidPickTable: false,
+      disableDeck: false
     })
   }
   gameover() {
