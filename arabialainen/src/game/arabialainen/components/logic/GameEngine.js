@@ -344,6 +344,7 @@ class GameEngine extends Component {
       cpuPile: [],
       deckId: null,
       deckVisibility: HIDDEN,
+      disableDeck: false,
       discardedByTen: false,
       discardPile: [],
       gameover: false,
