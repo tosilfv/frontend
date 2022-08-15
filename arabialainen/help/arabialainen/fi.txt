@@ -108,7 +108,6 @@ Tehtyjä toimintoja ei voi peruuttaa, esimerkiksi kortin lyömistä tai nostamis
 Muut
 Pelaajalle on pelistrategian vuoksi jätetty mahdollisuus kokeilla pakasta kympin tai ässän päälle, vaikka se on säännöissä kielletty.
 Oikeassakin elämässä voi pelissä huijata esimerkiksi silloin, kun siitä ei jää kiinni.
-Tietokoneen kokeilu pakasta on poissa käytöstä.
 
 Ilmoitukset
 Pelikentän vasempaan yläkulmaan ilmestyy pelin aikana viesti viimeisimmästä pelitapahtumasta, jos se vaatii pelaajan huomiota.
