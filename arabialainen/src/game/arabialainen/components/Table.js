@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { PILE_TABLE, VISIBLE } from '../constants/constants'
+import { PILE_TABLE, TURN_CPU, TURN_PLAYER, VISIBLE } from '../constants/constants'
 import { mapPile } from '../helpers/helpers'
 import Cpu from './Cpu'
 import Deck from './Deck'
@@ -83,38 +83,74 @@ class Table extends Component {
         </div>
       )
     } else {
-      return (
-        <div className="Table">
-          <div className='Table-info'>
-            <Message 
-              message={message}
-              removeMessage={removeMessage}
-            />
-            <Cpu
-              spinAmount={spinAmount}
-              spinVisibility={spinVisibility}
-            />
+      if (turn === TURN_CPU) {
+        return (
+          <div className="Table Table-noevents">
+            <div className='Table-info'>
+              <Message 
+                message={message}
+                removeMessage={removeMessage}
+              />
+              <Cpu
+                spinAmount={spinAmount}
+                spinVisibility={spinVisibility}
+              />
+            </div>
+            <div className="Table-piles">
+              <Deck
+                cardsRemaining={cardsRemaining}
+                deckVisibility={deckVisibility}
+                pickFromDeck={pickFromDeck}
+                turn={turn}
+              />
+            </div>
+            <Discard discardPile={discardPile} />
+            <div className="Table-playfield">
+              {mapPile(tablePile, pickTableCards, PILE_TABLE, gameover)}
+              <button
+                style={{ visibility: startButton }}
+                onClick={this.handleInitGame}
+                >
+                  Start New Game
+              </button>
+            </div>
           </div>
-          <div className="Table-piles">
-            <Deck
-              cardsRemaining={cardsRemaining}
-              deckVisibility={deckVisibility}
-              pickFromDeck={pickFromDeck}
-              turn={turn}
-            />
+        )
+      }
+      if (turn === TURN_PLAYER) {
+        return (
+          <div className="Table">
+            <div className='Table-info'>
+              <Message 
+                message={message}
+                removeMessage={removeMessage}
+              />
+              <Cpu
+                spinAmount={spinAmount}
+                spinVisibility={spinVisibility}
+              />
+            </div>
+            <div className="Table-piles">
+              <Deck
+                cardsRemaining={cardsRemaining}
+                deckVisibility={deckVisibility}
+                pickFromDeck={pickFromDeck}
+                turn={turn}
+              />
+            </div>
+            <Discard discardPile={discardPile} />
+            <div className="Table-playfield">
+              {mapPile(tablePile, pickTableCards, PILE_TABLE, gameover)}
+              <button
+                style={{ visibility: startButton }}
+                onClick={this.handleInitGame}
+                >
+                  Start New Game
+              </button>
+            </div>
           </div>
-          <Discard discardPile={discardPile} />
-          <div className="Table-playfield">
-            {mapPile(tablePile, pickTableCards, PILE_TABLE, gameover)}
-            <button
-              style={{ visibility: startButton }}
-              onClick={this.handleInitGame}
-              >
-                Start New Game
-            </button>
-          </div>
-        </div>
-      )
+        )
+      }
     }
   }
 }
