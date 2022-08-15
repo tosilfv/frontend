@@ -49,14 +49,14 @@ export function apiResponse(gameFn, apiRes, retVal) {
 export function caughtError(gameFn, error) {
   throw new Error(`${gameFn} error: ${error}`)
 }
-export function createCard(c, clickFn, pileName, gameover) {
+export function createCard(c, clickFn, pileName, gameover, disableDeck) {
   if (gameover) {
     return (
       <Card
         key={c.code}
         code={c.code}
         clickCard={clickFn}
-        disabled={true}
+        disableDeck={disableDeck}
         image={c.image}
         name={`${c.value} of ${c.suit}`}
         pile={pileName}
@@ -70,6 +70,7 @@ export function createCard(c, clickFn, pileName, gameover) {
         key={c.code}
         code={c.code}
         clickCard={clickFn}
+        disableDeck={disableDeck}
         image={c.image}
         name={`${c.value} of ${c.suit}`}
         pile={pileName}
@@ -118,18 +119,18 @@ export async function getDeck() {
     caughtError('getDeck', error)
   }
 }
-export function mapPile(pileState, clickFn, pileName, gameover) {
+export function mapPile(pileState, clickFn, pileName, gameover, disableDeck) {
   if (pileName === PILE_DISCARD) {
-    return pileState.map((c) => createCard(c, '', pileName, gameover))
+    return pileState.map((c) => createCard(c, '', pileName, gameover, disableDeck))
   }
   if (pileName === PILE_TABLE) {
-    return pileState.map((c) => createCard(c, clickFn, pileName, gameover))
+    return pileState.map((c) => createCard(c, clickFn, pileName, gameover, disableDeck))
   }
   if (pileName === PILE_CPU) {
-    return pileState.map((c) => createCard(c, clickFn, pileName, gameover))
+    return pileState.map((c) => createCard(c, clickFn, pileName, gameover, disableDeck))
   } else {
     const pileSorted = sortPile(pileState)
-    return pileSorted.map((c) => createCard(c, clickFn, pileName, gameover))
+    return pileSorted.map((c) => createCard(c, clickFn, pileName, gameover, disableDeck))
   }
 }
 export function nameCard(c) {

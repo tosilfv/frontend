@@ -16,8 +16,8 @@ class Card extends Component {
     const [ angle, x, y ] = [ randNum, randNum, randNum ]
     this._transform = `translate(${x}px, ${y}px) rotate(${angle}deg)`
   }
-  createImg(image, name, clName, clickFn, styleStr, disabled) {
-    if (disabled) {
+  createImg(image, name, clName, clickFn, styleStr, disableDeck) {
+    if (disableDeck) {
       return (
         <img
           className={clName}
@@ -56,7 +56,7 @@ class Card extends Component {
   }
   render() {
     const {
-      disabled,
+      disableDeck,
       image,
       name,
       pile
@@ -65,12 +65,12 @@ class Card extends Component {
       <div>
         {(pile === PILE_CPU || pile === PILE_PLAYER) && (
           this.createImg(
-            image, name, 'Card', this.handleHitCard, '', disabled
+            image, name, 'Card', this.handleHitCard, '', disableDeck
           )
         )}
         {pile === PILE_TABLE && (
           this.createImg(
-            image, name, 'Card Card-playfield', this.handlePickTableCards, this._transform, disabled
+            image, name, 'Card Card-playfield', this.handlePickTableCards, this._transform, disableDeck
           )
         )}
         {pile === PILE_DISCARD && (

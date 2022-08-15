@@ -183,6 +183,11 @@ class GameEngine extends Component {
       }
   }
   async hitCard(code, fromPile) {
+    if (this.state.turn === TURN_PLAYER) {
+      this.setState({
+        disableDeck: true
+      })
+    }
     let card = null
     let cardCode = code
     let deckCardCode = null
@@ -454,7 +459,10 @@ class GameEngine extends Component {
   }
   render() {
     const playerCards = mapPile(
-      this.state.playerPile, this.hitCard, PILE_PLAYER, this.state.gameover
+      this.state.playerPile,
+      this.hitCard, PILE_PLAYER,
+      this.state.gameover,
+      this.state.disableDeck
     )
     namePileCards(this.state.tablePile)
     return (
