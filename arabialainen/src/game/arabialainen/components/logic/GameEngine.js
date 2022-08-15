@@ -293,13 +293,21 @@ class GameEngine extends Component {
         if (checkedCardsSetCpu.size < this.state.cpuPile.length) {
           this.hitCard('', PILE_CPU)
         } else {
+          // if cpu cannot hit a card and there are no cards left on deck and table is not empty
+          if (this.state.cardsRemaining === 0) {
+            if (checkedCardsSetCpu.size === this.state.cpuPile.length) {
+              if (this.state.tablePile.length > 0) {
+                this.pickTableCards('', PILE_CPU)
+              } else {
+                // if cpu cannot hit a card and there are no cards left on deck and table is empty
+                this.changeTurn()
+              }
+            }
+          }
           // if all cpu cards are checked
           if (this.state.cardsRemaining > 0) {
             checkedCardsSetCpu.clear()
             this.pickFromDeck(PILE_CPU)
-          } else {
-            // if cpu cannot hit a card and there are no cards on deck left
-            this.changeTurn()
           }
         }
       }
