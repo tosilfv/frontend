@@ -5,20 +5,20 @@
   flex-direction: column;
   justify-content: center;
   text-shadow:
-    1px 0 1px orange,
-    0 2px 2px orange,
-    3px 0 3px orange,
-    0 4px 4px orange,
-    5px 0 5px orange,
-    0 6px 10px orange,
-    7px 0 15px orange,
-    0 8px 20px orange,
-    9px 0 25px orange,
-    0 10px 45px orange,
-    11px 0 50px orange,
-    0 12px 55px orange,
+    1px 0 30px orange,
+    0 2px 40px orange,
+    3px 0 50px orange,
+    0 4px 60px orange,
+    5px 0 70px orange,
+    0 6px 30px orange,
+    7px 0 40px orange,
+    0 8px 50px orange,
+    9px 0 60px orange,
+    0 10px 30px orange,
+    11px 0 40px orange,
+    0 12px 50px orange,
     13px 0 60px orange,
-    0 14px 65px orange;
+    0 14px 70px orange;
   width: 100vw;
 }
 .Cpu-loader {

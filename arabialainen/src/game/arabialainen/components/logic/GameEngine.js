@@ -103,7 +103,7 @@ class GameEngine extends Component {
       if (!this.state.discardedByTen) {
         if (this.state.turn === TURN_PLAYER) {
           this.setState({
-            message: `Cannot hit a picture card before table cards are discarded by ten at least once.`
+            message: `Cannot hit a court card (${cardName}) before table cards are discarded by ten (10) at least once.`
           })
           return false
         }
@@ -114,8 +114,8 @@ class GameEngine extends Component {
     }
     // table is not empty
     if (this.state.tablePile.length > 0) {
-      const tableCard = this.state.tablePile[this.state.tablePile.length - 1].sortName
-      let message = checkRules(tableCard, cardName, this.state.discardedByTen)
+      const tableCardName = this.state.tablePile[this.state.tablePile.length - 1].sortName
+      let message = checkRules(tableCardName, cardName, this.state.discardedByTen)
       if (this.state.turn === TURN_PLAYER) {
         if (typeof message === STRING) {
           this.setState({ message })
@@ -193,10 +193,10 @@ class GameEngine extends Component {
   async hitCard(code, fromPile) {
     let card = null
     let cardCode = code
-    let cardsRemaining = null
     let deckCardCode = null
     let discardCard = null
     let pileRes = null
+    let pileResDeck = null
     let pileResTable = null
     let randNum = null
     if (this.state.turn === TURN_PLAYER) {
@@ -227,34 +227,63 @@ class GameEngine extends Component {
         await drawFromPile(this.state.deckId, cardCode, fromPile)
         // call api to add card to table pile
         await addToPile(this.state.deckId, cardCode, PILE_TABLE)
-        // call api to check remaining cards on deck
-        cardsRemaining = await drawFromDeck(this.state.deckId, DRAW_ZERO)
-        if (cardsRemaining.data.remaining > 0) {
+        if (this.state.cardsRemaining > 0) {
           if (this.state[fromPile].length <= DRAW_INIT) {
             // call api to remove card from deck
-            const pileResDeck = await drawFromDeck(this.state.deckId, DRAW_ONE)
+            pileResDeck = await drawFromDeck(this.state.deckId, DRAW_ONE)
             deckCardCode = pileResDeck.data.cards[0].code
             // call api to add card to fromPile
             await addToPile(this.state.deckId, deckCardCode, fromPile)
+            // call api to list table pile
+            pileResTable = await getCards(this.state.deckId, PILE_TABLE)
+            // call api to list fromPile
+            pileRes = await getCards(this.state.deckId, fromPile)
+            if (this.state.turn === TURN_CPU) {
+              this.setState({
+                cpuDidhitCard: true
+              })
+            }
+            this.setState({
+              [fromPile]: pileRes.data.piles[fromPile].cards,
+              [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards,
+              canPickFromDeck: false,
+              cardsRemaining: pileResDeck.data.remaining,
+              disableCards: true
+            })
+          } else {
+            // call api to list table pile
+            pileResTable = await getCards(this.state.deckId, PILE_TABLE)
+            // call api to list fromPile
+            pileRes = await getCards(this.state.deckId, fromPile)
+            if (this.state.turn === TURN_CPU) {
+              this.setState({
+                cpuDidhitCard: true
+              })
+            }
+            this.setState({
+              [fromPile]: pileRes.data.piles[fromPile].cards,
+              [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards,
+              canPickFromDeck: false,
+              disableCards: true
+            })
           }
-        }
-        // call api to list table pile
-        pileResTable = await getCards(this.state.deckId, PILE_TABLE)
-        // call api to list fromPile
-        pileRes = await getCards(this.state.deckId, fromPile)
-        if (this.state.turn === TURN_CPU) {
+        } else {
+          // call api to list table pile
+          pileResTable = await getCards(this.state.deckId, PILE_TABLE)
+          // call api to list fromPile
+          pileRes = await getCards(this.state.deckId, fromPile)
+          if (this.state.turn === TURN_CPU) {
+            this.setState({
+              cpuDidhitCard: true
+            })
+          }
           this.setState({
-            cardsRemaining: cardsRemaining.data.remaining,
-            cpuDidhitCard: true
+            [fromPile]: pileRes.data.piles[fromPile].cards,
+            [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards,
+            canPickFromDeck: false,
+            disableCards: true
           })
         }
-        this.setState({
-          [fromPile]: pileRes.data.piles[fromPile].cards,
-          [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards,
-          canPickFromDeck: false,
-          cardsRemaining: cardsRemaining.data.remaining,
-          disableCards: true
-        })
         if (discardCard) {
           if (this.state.tablePile.length > 0) {
             if (this.state.turn === TURN_CPU) {
@@ -262,7 +291,7 @@ class GameEngine extends Component {
             }
             if (cardName === TEN) {
               this.setState({
-                cardsRemaining: cardsRemaining.data.remaining,
+                cardsRemaining: pileRes.data.remaining,
                 discardedByTen: true
               })
             }
@@ -270,7 +299,7 @@ class GameEngine extends Component {
           } else {
             this.setState({
               canPickFromDeck: false,
-              cardsRemaining: cardsRemaining.data.remaining
+              cardsRemaining: pileRes.data.remaining
             })
             this.changeTurn()
           }
@@ -334,9 +363,8 @@ class GameEngine extends Component {
     this.setState({ deckId })
   }
   async pickFromDeck(pile) {
-    // call api to check remaining cards on deck
-    let cardsRemaining = await drawFromDeck(this.state.deckId, DRAW_ZERO)
-    if (cardsRemaining.data.remaining > 0) {
+    let pileResDeck = null
+    if (this.state.cardsRemaining > 0) {
       if (this.state.canPickFromDeck) {
         this.setState({
           canPickFromDeck: false
@@ -346,7 +374,7 @@ class GameEngine extends Component {
         let pileRes = null
         let pileResTable = null
         // call api to remove card from deck
-        const pileResDeck = await drawFromDeck(this.state.deckId, DRAW_ONE)
+        pileResDeck = await drawFromDeck(this.state.deckId, DRAW_ONE)
         deckCard = pileResDeck.data.cards[0]
         deckCardCode = pileResDeck.data.cards[0].code
         // call api to add card to table pile
@@ -364,7 +392,7 @@ class GameEngine extends Component {
           this.setState({
             [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards,
             canPickFromDeck: true,
-            cardsRemaining: cardsRemaining.data.remaining,
+            cardsRemaining: pileResDeck.data.remaining,
             cpuDidhitCard: true,
             cpuDidPickTable: false
           })
@@ -373,7 +401,7 @@ class GameEngine extends Component {
           this.setState({
             [PILE_TABLE]: pileResTable.data.piles[PILE_TABLE].cards,
             canPickFromDeck: false,
-            cardsRemaining: cardsRemaining.data.remaining
+            cardsRemaining: pileResDeck.data.remaining
           })
         }
         let namedCard = nameCard(deckCard)
@@ -387,7 +415,7 @@ class GameEngine extends Component {
               }
               if (cardName === TEN) {
                 this.setState({
-                  cardsRemaining: cardsRemaining.data.remaining,
+                  cardsRemaining: pileResDeck.data.remaining,
                   discardedByTen: true
                 })
               }
@@ -395,7 +423,7 @@ class GameEngine extends Component {
             } else {
               this.setState({
                 canPickFromDeck: false,
-                cardsRemaining: cardsRemaining.data.remaining
+                cardsRemaining: pileResDeck.data.remaining
               })
               this.changeTurn()
             }
@@ -426,7 +454,7 @@ class GameEngine extends Component {
       this.setState({
         canPickFromDeck: false,
         cpuDidPickTable: true,
-        message: `CPU picked up the table card[s].`
+        message: `CPU picked up the table card(s).`
       })
     }
     this.setState({
