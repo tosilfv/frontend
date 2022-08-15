@@ -8,7 +8,10 @@ class Deck extends Component {
     this.handlePickFromDeck = this.handlePickFromDeck.bind(this)
   }
   handlePickFromDeck() {
-    return this.props.pickFromDeck(PILE_PLAYER)
+    console.log('this.props.disableDeck: ', this.props.disableDeck)
+    if (this.props.disableDeck === false) {
+      return this.props.pickFromDeck(PILE_PLAYER)
+    }
   }
   render() {
     const {

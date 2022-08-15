@@ -45,6 +45,7 @@ class GameEngine extends Component {
       cpuPile: [],
       deckId: null,
       deckVisibility: HIDDEN,
+      disableDeck: false,
       discardedByTen: false,
       discardPile: [],
       gameover: false,
@@ -75,6 +76,7 @@ class GameEngine extends Component {
       if (this.state.turn === TURN_CPU) {
         checkedCardsSetCpu.clear()
         this.setState({
+          disableDeck: false,
           spinAmount: 1,
           spinVisibility: HIDDEN,
           turn: TURN_PLAYER
@@ -84,6 +86,7 @@ class GameEngine extends Component {
         this.setState({
           cpuDidhitCard: false,
           cpuDidPickTable: false,
+          disableDeck: true,
           spinAmount: INFINITE,
           spinVisibility: VISIBLE,
           turn: TURN_CPU
@@ -351,6 +354,11 @@ class GameEngine extends Component {
     this.setState({ deckId })
   }
   async pickFromDeck(pile) {
+    if (this.state.turn === TURN_PLAYER) {
+      this.setState({
+        disableDeck: true
+      })
+    }
     let pileResDeck = null
     if (this.state.cardsRemaining > 0) {
       let deckCard = null
@@ -460,6 +468,7 @@ class GameEngine extends Component {
           cardsRemaining={this.state.cardsRemaining}
           cpuCardsLeft={this.state.cpuPile.length}
           deckVisibility={this.state.deckVisibility}
+          disableDeck={this.state.disableDeck}
           discardPile={this.state.discardPile}
           gameover={this.state.gameover}
           message={this.state.message}
