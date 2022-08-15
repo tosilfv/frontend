@@ -37,6 +37,7 @@ class Table extends Component {
       removeMessage,
       cardsRemaining,
       deckVisibility,
+      disableDeck,
       discardPile,
       cpuCardsLeft,
       gameover,
@@ -66,6 +67,7 @@ class Table extends Component {
             <Deck
               cardsRemaining={cardsRemaining}
               deckVisibility={deckVisibility}
+              disableDeck={disableDeck}
               pickFromDeck={pickFromDeck}
               turn={turn}
             />
@@ -100,6 +102,7 @@ class Table extends Component {
               <Deck
                 cardsRemaining={cardsRemaining}
                 deckVisibility={deckVisibility}
+                disableDeck={disableDeck}
                 pickFromDeck={pickFromDeck}
                 turn={turn}
               />
@@ -134,6 +137,7 @@ class Table extends Component {
               <Deck
                 cardsRemaining={cardsRemaining}
                 deckVisibility={deckVisibility}
+                disableDeck={disableDeck}
                 pickFromDeck={pickFromDeck}
                 turn={turn}
               />
