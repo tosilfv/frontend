@@ -184,11 +184,6 @@ class GameEngine extends Component {
       }
   }
   async hitCard(code, fromPile) {
-    if (this.state.turn === TURN_PLAYER) {
-      this.setState({
-        disableDeck: true
-      })
-    }
     let card = null
     let cardCode = code
     let deckCardCode = null
