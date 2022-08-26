@@ -54,8 +54,8 @@ export function createCard(c, clickFn, pileName, gameover, disableDeck) {
     <Card
       key={c.code}
       code={c.code}
-      clickCard={gameover ? '' : clickFn}
-      disableDeck={gameover ? disableDeck : ''}
+      clickCard={gameover ? null : clickFn}
+      disableDeck={gameover ? disableDeck : false}
       image={c.image}
       name={`${c.value} of ${c.suit}`}
       pile={pileName}

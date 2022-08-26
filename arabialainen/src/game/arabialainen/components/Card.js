@@ -17,27 +17,15 @@ class Card extends Component {
     this._transform = `translate(${x}px, ${y}px) rotate(${angle}deg)`
   }
   createImg(image, name, clName, clickFn, styleStr, disableDeck) {
-    if (disableDeck) {
-      return (
-        <img
-          className={clName}
-          src={image}
-          alt={name}
-          style={{ transform: styleStr }}
-          disabled
-        />
-      )
-    } else {
-      return (
-        <img
-          className={clName}
-          src={image}
-          alt={name}
-          onClick={clickFn}
-          style={{ transform: styleStr }}
-        />
-      )
-    }
+    return (
+      <img
+        className={clName}
+        src={image}
+        alt={name}
+        onClick={disableDeck ? null : clickFn}
+        style={{ transform: styleStr }}
+      />
+    )
   }
   createDiscardImg(styleStr) {
     return (

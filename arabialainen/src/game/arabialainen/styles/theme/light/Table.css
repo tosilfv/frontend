@@ -13,7 +13,7 @@
   display: flex;
   width: 100%;
 }
-.Table-noevents {
+.Table-piles-noevents {
   pointer-events: none;
 }
 .Table-piles {

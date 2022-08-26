@@ -14,26 +14,23 @@ class Message extends Component {
       gameover,
       message
     } = this.props
-    if (gameover) {
-      return (
-        <div className='Message'>
-          <p>{message}</p>
-        </div>
-      )
-    } else {
-      return (
-        <div className='Message'>
-          {message &&
+    return (
+      <div className='Message'>
+        {gameover ? (
+          <></>
+          ) : (
+          message &&
             <button
               className='Message-close'
               onClick={this.handleRemove}
               >
                 X
-            </button>}
-          <p>{message}</p>
-        </div>
-      )
-    }
+            </button>
+          )
+        }
+        <p>{message}</p>
+      </div>
+    )
   }
 }
 
