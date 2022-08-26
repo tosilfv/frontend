@@ -18,68 +18,36 @@ class Deck extends Component {
       deckVisibility,
       turn
     } = this.props
-    if (turn === TURN_CPU) {
-      return (
-        <div>
-          {cardsRemaining === 0 &&
-            <div></div>
-          }
-          {cardsRemaining === 1 &&
-            <div
-              className="Deck-pick"
+    return (
+      <div>
+        {cardsRemaining === 0 &&
+          <div></div>
+        }
+        {cardsRemaining === 1 &&
+          <div className='Deck-pick'
+            onClick={turn === TURN_PLAYER ? this.handlePickFromDeck : null}
+            style={{ visibility: deckVisibility }}
+            >
+              arabialainen
+          </div>
+        }
+        {cardsRemaining > 1 &&
+          <div>
+            <div className={turn === TURN_CPU ? 'Deck Deck-pick-noevents' : 'Deck'}
               style={{ visibility: deckVisibility }}
               >
                 arabialainen
             </div>
-          }
-          {cardsRemaining > 1 &&
-            <div>
-              <div className="Deck"
-                style={{ visibility: deckVisibility }}
-                >
-                  arabialainen
-              </div>
-              <div style={{ visibility: deckVisibility }}
-                >
-                  arabialainen
-              </div>
-            </div>
-          }
-        </div>
-      )
-    }
-    if (turn === TURN_PLAYER) {
-      return (
-        <div>
-          {cardsRemaining === 0 &&
-            <div></div>
-          }
-          {cardsRemaining === 1 &&
-            <div className="Deck-pick"
-              onClick={this.handlePickFromDeck}
+            <div className={turn === TURN_CPU ? 'Deck-pick Deck-pick-noevents' : 'Deck-pick'}
+              onClick={turn === TURN_PLAYER ? this.handlePickFromDeck : null}
               style={{ visibility: deckVisibility }}
               >
                 arabialainen
             </div>
-          }
-          {cardsRemaining > 1 &&
-            <div>
-              <div className="Deck"
-                style={{ visibility: deckVisibility }}
-                >
-                  arabialainen
-              </div>
-              <div className="Deck-pick"
-                onClick={this.handlePickFromDeck}
-                style={{ visibility: deckVisibility }}
-                >
-                  arabialainen
-              </div>
-            </div>
-          }
-        </div>
-      )
-    }
+          </div>
+        }
+      </div>
+    )
   }
 }
 

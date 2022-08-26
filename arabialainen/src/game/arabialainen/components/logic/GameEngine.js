@@ -45,7 +45,7 @@ class GameEngine extends Component {
       cpuPile: [],
       deckId: null,
       deckVisibility: HIDDEN,
-      disableDeck: false,
+      disableDeck: true,
       discardedByTen: false,
       discardPile: [],
       gameover: false,
@@ -103,11 +103,8 @@ class GameEngine extends Component {
           this.setState({
             message: `Cannot hit a court card (${cardName}) before table cards are discarded by ten (10) at least once.`
           })
-          return false
         }
-        if (this.state.turn === TURN_CPU) {
-          return false
-        }
+        return false
       }
     }
     // table is not empty
@@ -118,17 +115,14 @@ class GameEngine extends Component {
         if (typeof message === STRING) {
           this.setState({ message })
           return false
-        } else {
-          return message
         }
       }
       if (this.state.turn === TURN_CPU) {
-        if (typeof message === BOOLEAN) {
-          return message
-        } else {
+        if (typeof message !== BOOLEAN) {
           return false
         }
       }
+      return message
     }
     // table is empty
     return true
@@ -339,7 +333,7 @@ class GameEngine extends Component {
       cpuPile: [],
       deckId: null,
       deckVisibility: HIDDEN,
-      disableDeck: false,
+      disableDeck: true,
       discardedByTen: false,
       discardPile: [],
       gameover: false,
@@ -465,19 +459,19 @@ class GameEngine extends Component {
     return (
       <div>
         <Table
-          initGame={this.initGame}
-          newGame={this.newGame}
-          pickFromDeck={this.pickFromDeck}
-          pickTableCards={this.pickTableCards}
-          removeMessage={this.removeMessage}
           cardsRemaining={this.state.cardsRemaining}
           cpuCardsLeft={this.state.cpuPile.length}
           deckVisibility={this.state.deckVisibility}
           disableDeck={this.state.disableDeck}
           discardPile={this.state.discardPile}
           gameover={this.state.gameover}
+          initGame={this.initGame}
           message={this.state.message}
+          newGame={this.newGame}
+          pickFromDeck={this.pickFromDeck}
+          pickTableCards={this.pickTableCards}
           playerCardsLeft={this.state.playerPile.length}
+          removeMessage={this.removeMessage}
           spinAmount={this.state.spinAmount}
           spinVisibility={this.state.spinVisibility}
           startButton={this.state.startButton}
